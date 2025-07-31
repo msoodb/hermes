@@ -8,8 +8,6 @@
  * See LICENSE file for details.
  */
 
-#include "hrms_config.h"
-
 #include "hrms_led.h"
 
 #include "hrms_oled.h"

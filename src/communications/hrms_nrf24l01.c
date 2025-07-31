@@ -7,7 +7,6 @@
  * See LICENSE file for details.
  */
 
-#include "hrms_config.h"
 
 #include "hrms_nrf24l01.h"
 #include "hrms_pins.h"

@@ -16,7 +16,6 @@
  */
 
 #include "hrms_taskmanager.h"
-#include "hrms_config.h"
 #include "hrms_joystick.h"
 #include "hrms_gpio.h"
 #include "hrms_pins.h"

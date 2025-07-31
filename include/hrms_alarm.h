@@ -8,7 +8,6 @@
  * See LICENSE file for details.
  */
 
-#include "hrms_config.h"
 
 #ifndef HRMS_ALARM_H
 #define HRMS_ALARM_H

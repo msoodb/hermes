@@ -1,4 +1,3 @@
-#include "hrms_config.h"
 
 #ifndef HRMS_POTENTIOMETER_H
 #define HRMS_POTENTIOMETER_H

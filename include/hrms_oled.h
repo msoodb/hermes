@@ -1,5 +1,4 @@
 
-#include "hrms_config.h"
 
 #ifndef HRMS_OLED_H
 #define HRMS_OLED_H

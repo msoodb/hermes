@@ -1,4 +1,3 @@
-#include "hrms_config.h"
 
 #ifndef HRMS_BIGSOUND_H
 #define HRMS_BIGSOUND_H

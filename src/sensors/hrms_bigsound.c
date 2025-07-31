@@ -1,5 +1,4 @@
 
-#include "hrms_config.h"
 
 #include "hrms_bigsound.h"
 #include "FreeRTOS.h"

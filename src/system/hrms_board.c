@@ -15,7 +15,6 @@
 #include "hrms_uart.h"
 #include "hrms_adc.h"
 #include "hrms_delay.h"
-#include "hrms_config.h"
 
 void hrms_board_init(void) {
   hrms_clock_init();    // System clocks

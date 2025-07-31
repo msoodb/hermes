@@ -8,7 +8,6 @@
  * See LICENSE file for details.
  */
 
-#include "hrms_config.h"
 
 #include "hrms_temperature.h"
 #include "hrms_adc.h"

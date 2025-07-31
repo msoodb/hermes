@@ -10,7 +10,6 @@
 #ifndef HRMS_COMMUNICATION_HUB_H
 #define HRMS_COMMUNICATION_HUB_H
 
-#include "hrms_config.h"
 
 #include "hrms_types.h"
 #include <stdbool.h>

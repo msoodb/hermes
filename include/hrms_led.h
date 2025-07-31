@@ -8,7 +8,6 @@
  * See LICENSE file for details.
  */
 
-#include "hrms_config.h"
 
 #ifndef HRMS_LED_H
 #define HRMS_LED_H

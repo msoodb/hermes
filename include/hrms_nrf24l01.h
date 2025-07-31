@@ -10,7 +10,6 @@
 #ifndef HRMS_NRF24L01_H
 #define HRMS_NRF24L01_H
 
-#include "hrms_config.h"
 
 #include "hrms_types.h"
 #include <stdbool.h>

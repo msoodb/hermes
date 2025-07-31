@@ -9,7 +9,6 @@
 
 #include "hrms_controller.h"
 #include "FreeRTOS.h"
-#include "hrms_config.h"
 #include "hrms_gpio.h"
 #include "hrms_pins.h"
 #include "hrms_state.h"

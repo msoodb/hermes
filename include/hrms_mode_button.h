@@ -8,8 +8,6 @@
  * See LICENSE file for details.
  */
 
-#include "hrms_config.h"
-
 #ifndef HRMS_MODE_BUTTON_H
 #define HRMS_MODE_BUTTON_H
 

@@ -7,7 +7,6 @@
  * See LICENSE file for details.
  */
 
-#include "hrms_config.h"
 
 #include "hrms_communication_hub.h"
 #include "hrms_types.h"

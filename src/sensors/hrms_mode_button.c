@@ -9,7 +9,6 @@
  * See LICENSE file for details.
  */
 
-#include "hrms_config.h"
 
 #include "hrms_mode_button.h"
 #include "FreeRTOS.h"

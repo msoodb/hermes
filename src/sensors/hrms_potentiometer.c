@@ -4,7 +4,6 @@
  * GPLv3
  */
 
-#include "hrms_config.h"
 
 #include "hrms_potentiometer.h"
 #include "hrms_adc.h"
