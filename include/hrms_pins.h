@@ -14,24 +14,6 @@
 // === ACTUATORS ===============
 // =============================
 
-/* --- MOTOR MODULE --- */
-#define HRMS_MOTOR_LEFT_EN_PORT GPIOA
-#define HRMS_MOTOR_LEFT_EN_PIN 0
-
-#define HRMS_MOTOR_RIGHT_EN_PORT GPIOA
-#define HRMS_MOTOR_RIGHT_EN_PIN 1
-
-#define HRMS_MOTOR_LEFT_IN1_PORT GPIOB
-#define HRMS_MOTOR_LEFT_IN1_PIN 0
-
-#define HRMS_MOTOR_LEFT_IN2_PORT GPIOB
-#define HRMS_MOTOR_LEFT_IN2_PIN 1
-
-#define HRMS_MOTOR_RIGHT_IN1_PORT GPIOB
-#define HRMS_MOTOR_RIGHT_IN1_PIN 10
-
-#define HRMS_MOTOR_RIGHT_IN2_PORT GPIOB
-#define HRMS_MOTOR_RIGHT_IN2_PIN 11
 
 /* --- LED MODULE --- */
 #define HRMS_LED_ONBOARD_PORT GPIOC
@@ -79,10 +61,6 @@
 #define HRMS_TEMP_SENSOR_PORT GPIOA
 #define HRMS_TEMP_SENSOR_PIN 5
 
-/* --- IR REMOTE MODULE --- */
-#define HRMS_IR_REMOTE_PORT GPIOA
-#define HRMS_IR_REMOTE_PIN 8
-
 /* --- MODE BUTTON MODULE --- */
 #define HRMS_MODE_BUTTON_PORT GPIOA
 #define HRMS_MODE_BUTTON_PIN 4
@@ -104,7 +82,6 @@
 // =============================
 
 /* --- PWM PROTOCOL --- */
-// PWM pins are now defined in SERVO MODULES section below
 
 /* --- SPI1 PROTOCOL --- */
 #define HRMS_SPI1_NSS_PORT  GPIOA
@@ -127,19 +104,6 @@
 #define HRMS_I2C1_SDA_PIN 7
 
 
-/* --- SERVO MODULES --- */
-// 4 independent servos - enabled for servo testing
-#define HRMS_SERVO1_PWM_PORT GPIOA
-#define HRMS_SERVO1_PWM_PIN  0
-
-#define HRMS_SERVO2_PWM_PORT GPIOA
-#define HRMS_SERVO2_PWM_PIN  1
-
-#define HRMS_SERVO3_PWM_PORT GPIOA
-#define HRMS_SERVO3_PWM_PIN  2
-
-#define HRMS_SERVO4_PWM_PORT GPIOA
-#define HRMS_SERVO4_PWM_PIN  3
 
 
 // =============================

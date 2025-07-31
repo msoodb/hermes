@@ -31,7 +31,6 @@
 
 #include "hrms_mode_button.h"
 
-#include "hrms_ir_remote.h"
 
 #include "hrms_bigsound.h"
 
@@ -48,7 +47,6 @@ static void handle_sensor_data(void);
 
 static void handle_bigsound_event(void);
 
-static void handle_ir_remote_event(void);
 
 static void handle_mode_button_event(void);
 
@@ -71,7 +69,6 @@ static QueueHandle_t xActuatorCmdQueue = NULL;
 
 static QueueHandle_t xBigSoundQueue = NULL;
 
-static QueueHandle_t xIRRemoteQueue = NULL;
 
 static QueueHandle_t xModeButtonQueue = NULL;
 
@@ -91,8 +88,6 @@ void hrms_taskmanager_setup(void) {
   xBigSoundQueue = xQueueCreate(5, sizeof(hrms_bigsound_event_t));
   configASSERT(xBigSoundQueue != NULL);
 
-  xIRRemoteQueue = xQueueCreate(5, sizeof(hrms_ir_remote_event_t));
-  configASSERT(xIRRemoteQueue != NULL);
 
   xModeButtonQueue = xQueueCreate(5, sizeof(hrms_mode_button_event_t));
   configASSERT(xModeButtonQueue != NULL);
@@ -106,7 +101,6 @@ void hrms_taskmanager_setup(void) {
   xQueueAddToSet(xSensorDataQueue, xControllerQueueSet);
 
   xQueueAddToSet(xBigSoundQueue, xControllerQueueSet);
-  xQueueAddToSet(xIRRemoteQueue, xControllerQueueSet);
   xQueueAddToSet(xModeButtonQueue, xControllerQueueSet);
 // ESP32 queue set removed
 
@@ -121,7 +115,6 @@ void hrms_taskmanager_setup(void) {
 
   hrms_bigsound_init(xBigSoundQueue);
 
-  hrms_ir_remote_init(xIRRemoteQueue);
 
 // ESP32 init removed
 
@@ -179,9 +172,6 @@ static void vControllerTask(void *pvParameters) {
         xQueueSelectFromSet(xControllerQueueSet, pdMS_TO_TICKS(100));
 
     if (activated == NULL) {
-      if (hrms_controller_check_ir_timeout(&command)) {
-        xQueueSendToBack(xActuatorCmdQueue, &command, 0);
-      }
 // ESP32 event polling removed
       continue;
     }
@@ -191,9 +181,6 @@ static void vControllerTask(void *pvParameters) {
     }
     else if (activated == xBigSoundQueue) {
       handle_bigsound_event();
-    }
-    else if (activated == xIRRemoteQueue) {
-      handle_ir_remote_event();
     }
     else if (activated == xModeButtonQueue) {
       handle_mode_button_event();
@@ -237,15 +224,6 @@ static void handle_bigsound_event(void) {
   }
 }
 
-static void handle_ir_remote_event(void) {
-  hrms_ir_remote_event_t event;
-  hrms_actuator_command_t command;
-
-  if (xQueueReceive(xIRRemoteQueue, &event, 0) == pdPASS) {
-    hrms_controller_process_ir_remote(&event, &command);
-    xQueueSendToBack(xActuatorCmdQueue, &command, 0);
-  }
-}
 
 static void handle_mode_button_event(void) {
   hrms_mode_button_event_t event;

@@ -40,12 +40,6 @@ void hrms_controller_cycle_mode(hrms_actuator_command_t *out);
 void hrms_controller_process(const hrms_sensor_data_t *in,
                              hrms_actuator_command_t *out);
 
-/**
- * Handle IR remote events in MANUAL mode.
- * Sets motion state and actuator outputs.
- */
-void hrms_controller_process_ir_remote(const hrms_ir_remote_event_t *in,
-                                       hrms_actuator_command_t *out);
 
 
 /**
@@ -55,11 +49,6 @@ void hrms_controller_process_ir_remote(const hrms_ir_remote_event_t *in,
 void hrms_controller_process_mode_button(const hrms_mode_button_event_t *event,
                                          hrms_actuator_command_t *command);
 
-/**
- * Check if the IR remote has timed out.
- * Currently always returns false.
- */
-bool hrms_controller_check_ir_timeout(hrms_actuator_command_t *out);
 
 // ESP32 communication removed - ready for new implementation
 

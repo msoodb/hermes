@@ -115,33 +115,6 @@ typedef struct {
   bool button_pressed; // true if SW button is pressed
 } hrms_joystick_data_t;
 
-typedef enum {
-  HRMS_IR_CMD_NONE = 0,
-  HRMS_IR_CMD_1 = 0x45,
-  HRMS_IR_CMD_2 = 0x46,
-  HRMS_IR_CMD_3 = 0x47,
-  HRMS_IR_CMD_4 = 0x44,
-  HRMS_IR_CMD_5 = 0x40,
-  HRMS_IR_CMD_6 = 0x43,
-  HRMS_IR_CMD_7 = 0x07,
-  HRMS_IR_CMD_8 = 0x15,
-  HRMS_IR_CMD_9 = 0x09,
-  HRMS_IR_CMD_0 = 0x19,
-  HRMS_IR_CMD_STAR = 0x16,
-  HRMS_IR_CMD_HASH = 0x0D,
-  HRMS_IR_CMD_UP = 0x18,
-  HRMS_IR_CMD_DOWN = 0x52,
-  HRMS_IR_CMD_LEFT = 0x08,
-  HRMS_IR_CMD_RIGHT = 0x5A,
-  HRMS_IR_CMD_OK = 0x1C,
-  HRMS_IR_CMD_REPEAT = 0xFFFFFFFF
-} hrms_ir_command_t;
-
-typedef struct {
-  uint32_t timestamp;        // Tick count at event
-  uint32_t pulse_us;         // Raw IR code received
-  hrms_ir_command_t command; // Decoded command
-} hrms_ir_remote_event_t;
 
 
 typedef struct {
@@ -166,64 +139,6 @@ typedef struct {
 // ACTUATORS
 //==============================================================================
 
-typedef struct {
-  uint16_t speed;     // 0–255
-  uint8_t direction; // 0 = forward, 1 = backward
-} hrms_single_motor_command_t;
-
-typedef struct {
-  hrms_single_motor_command_t left;
-  hrms_single_motor_command_t right;
-} hrms_motor_command_t;
-
-typedef struct {
-  int32_t target_position; // e.g., in steps
-  uint16_t speed;          // steps per second
-  bool direction;          // false = CW, true = CCW, or use enum
-  bool enabled;            // whether to drive this motor or ignore it
-} hrms_stepmotor_command_t;
-
-typedef enum {
-  HRMS_STEPMOTOR_NECK = 0,
-  HRMS_STEPMOTOR_ELBOW,
-  HRMS_STEPMOTOR_WRIST,
-  HRMS_STEPMOTOR_COUNT
-} hrms_stepmotor_id_t;
-
-typedef enum {
-  HRMS_SERVO_TYPE_SCANNER = 0,     // Continuous scanning motion
-  HRMS_SERVO_TYPE_TRACKER,         // Position tracking based on sensors
-  HRMS_SERVO_TYPE_MANUAL,          // Manual control only
-  HRMS_SERVO_TYPE_STATIC,          // Fixed position
-  HRMS_SERVO_TYPE_PROPORTIONAL,    // Precise proportional positioning
-  HRMS_SERVO_TYPE_RADAR            // Radar sweep from extreme left to right
-} hrms_servo_type_t;
-
-typedef struct {
-  uint8_t angle;                    // Target angle (0-180)
-  uint16_t pulse_width_us;          // Optional: direct pulse width (1000-2000us)
-  
-  // Scanner-specific parameters
-  uint8_t scan_min_angle;           // Scanner minimum angle (default: 0)
-  uint8_t scan_max_angle;           // Scanner maximum angle (default: 180)
-  uint8_t scan_step;                // Scanner step size (default: 5)
-  uint16_t scan_delay_ms;           // Scanner delay between steps (default: 100)
-  
-  // Tracker-specific parameters
-  int16_t target_x;                 // Target X coordinate for tracking
-  int16_t target_y;                 // Target Y coordinate for tracking
-  uint8_t tracking_speed;           // Tracking movement speed (1-10)
-  
-  // Proportional-specific parameters
-  int16_t proportional_input;       // Input value (-1000 to +1000)
-  uint8_t deadband;                 // Deadband around center (0-50)
-  uint8_t travel_limit;             // Travel limit percentage (50-100)
-  
-  // General parameters
-  uint8_t speed;                    // Movement speed (1-10, 10=fastest)
-  bool enable_smooth;               // Enable smooth movement
-  bool reverse_direction;           // Reverse servo direction
-} hrms_servomotor_command_t;
 
 typedef struct {
   char line1[HRMS_DISPLAY_LINE_LENGTH];
@@ -277,16 +192,10 @@ typedef struct {
 // Radio command removed - ready for new communication implementation
 
 typedef struct {
-  hrms_motor_command_t motor;
   hrms_display_command_t display;
   hrms_oled_command_t oled;
   hrms_led_command_t led;
   hrms_alarm_command_t alarm;
-  hrms_servomotor_command_t servo1;
-  hrms_servomotor_command_t servo2;
-  hrms_servomotor_command_t servo3;
-  hrms_servomotor_command_t servo4;
-  hrms_stepmotor_command_t stepmotor;
 } hrms_actuator_command_t;
 
 #endif // HRMS_TYPES_H
