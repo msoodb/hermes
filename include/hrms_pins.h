@@ -25,24 +25,6 @@
 #define HRMS_LED_DEBUG_PORT GPIOC
 #define HRMS_LED_DEBUG_PIN 15
 
-/* --- DISPLAY MODULE (LCD) --- */
-#define HRMS_LCD_RS_PORT GPIOB
-#define HRMS_LCD_RS_PIN 12
-
-#define HRMS_LCD_E_PORT GPIOB
-#define HRMS_LCD_E_PIN 13
-
-#define HRMS_LCD_D4_PORT GPIOB
-#define HRMS_LCD_D4_PIN 14
-
-#define HRMS_LCD_D5_PORT GPIOB
-#define HRMS_LCD_D5_PIN 15
-
-#define HRMS_LCD_D6_PORT GPIOB
-#define HRMS_LCD_D6_PIN 2    // Moved from PB7 to PB2
-
-#define HRMS_LCD_D7_PORT GPIOB
-#define HRMS_LCD_D7_PIN 8
 
 /* --- ALARM MODULE --- */
 #define HRMS_BUZZER_PORT GPIOC

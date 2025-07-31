@@ -19,11 +19,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define LCD_CYCLE_COUNT 50
 #define MODE_BUTTON_DEBOUNCE_MS 100
-
-static int lcd_mode = 0;
-static int lcd_counter = 0;
 
 char num_buf[12];
 
@@ -114,35 +110,6 @@ void hrms_controller_process(const hrms_sensor_data_t *in,
 
   out->led.mode = led_mode;
   out->led.blink_speed_ms = led_blink_speed;
-
-  char buf1[17];
-  char num_buf[12];
-
-  lcd_counter++;
-  if (lcd_counter >= LCD_CYCLE_COUNT) {
-    lcd_counter = 0;
-    lcd_mode = (lcd_mode + 1) % 3;
-  }
-
-  if (lcd_mode == 0) {
-    strcpy(buf1, "Temp: ");
-    uint_to_str(num_buf, in->temperature.temperature_mc / 1000);
-    strcat(buf1, num_buf);
-    strcat(buf1, " C");
-  } else if (lcd_mode == 1) {
-    strcpy(buf1, "Speed: ");
-    // uint_to_str(num_buf, in->imu.speed_cm_s);
-    strcat(buf1, num_buf);
-    strcat(buf1, " cm/s");
-  } else {
-    strcpy(buf1, "Temp: ");
-    uint_to_str(num_buf, in->temperature.temperature_mc);
-    strcat(buf1, num_buf);
-    strcat(buf1, " C");
-  }
-
-  strcpy(out->display.line1, buf1);
-  strcpy(out->display.line2, num_buf);
 
   out->oled.icon1 = HRMS_OLED_ICON_NONE;
   out->oled.icon2 = HRMS_OLED_ICON_NONE;

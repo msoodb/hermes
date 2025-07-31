@@ -12,8 +12,6 @@
 
 #include "hrms_led.h"
 
-#include "hrms_display.h"
-
 #include "hrms_oled.h"
 
 #include "hrms_alarm.h"
@@ -27,8 +25,6 @@
 void hrms_actuator_hub_init(void) {
   hrms_led_init();
 
-  hrms_display_init();
-
   hrms_oled_init();
 
   hrms_alarm_init();
@@ -41,8 +37,6 @@ void hrms_actuator_hub_apply(const hrms_actuator_command_t *cmd) {
     return;
 
   hrms_led_apply(&cmd->led);
-
-  hrms_display_apply(&cmd->display);
 
   hrms_oled_apply(&cmd->oled);
 

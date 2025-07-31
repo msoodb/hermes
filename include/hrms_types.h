@@ -17,8 +17,6 @@
 // DISPLAY CONSTANTS
 //==============================================================================
 
-#define HRMS_DISPLAY_LINE_LENGTH 17 // 16 chars + '\0'
-
 #define HRMS_OLED_WIDTH 128
 #define HRMS_OLED_HEIGHT 32
 #define HRMS_OLED_PAGES (HRMS_OLED_HEIGHT / 8)
@@ -140,10 +138,6 @@ typedef struct {
 //==============================================================================
 
 
-typedef struct {
-  char line1[HRMS_DISPLAY_LINE_LENGTH];
-  char line2[HRMS_DISPLAY_LINE_LENGTH];
-} hrms_display_command_t;
 
 typedef enum {
   HRMS_OLED_ICON_NONE = 0,
@@ -192,7 +186,6 @@ typedef struct {
 // Radio command removed - ready for new communication implementation
 
 typedef struct {
-  hrms_display_command_t display;
   hrms_oled_command_t oled;
   hrms_led_command_t led;
   hrms_alarm_command_t alarm;
