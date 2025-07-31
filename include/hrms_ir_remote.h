@@ -9,8 +9,6 @@
 
 #include "hrms_config.h"
 
-#if HRMS_ENABLED_IR_REMOTE
-
 #ifndef HRMS_IR_REMOTE_H
 #define HRMS_IR_REMOTE_H
 
@@ -23,5 +21,3 @@ void hrms_ir_remote_init(QueueHandle_t controller_queue);
 void ir_exti_handler(void);
 
 #endif // HRMS_IR_REMOTE_H
-
-#endif /* HRMS_ENABLED_IR_REMOTE */

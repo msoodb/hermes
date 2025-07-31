@@ -9,17 +9,13 @@
 
 #include "hrms_config.h"
 
-#if HRMS_ENABLED_COMMUNICATION_HUB
-
 #include "hrms_communication_hub.h"
 #include "hrms_types.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "libc_stubs.h"
 
-#if HRMS_ENABLED_NRF24L01
 #include "hrms_nrf24l01.h"
-#endif
 
 // Communication hub state
 static hrms_comm_stats_t comm_stats = {0};
@@ -30,7 +26,6 @@ void hrms_communication_hub_init(void) {
   memset(&comm_stats, 0, sizeof(comm_stats));
   
   // Initialize enabled communication modules
-#if HRMS_ENABLED_NRF24L01
   if (hrms_nrf24l01_init()) {
     // Configure nRF24L01 with default settings
     nrf24l01_config_t config = {
@@ -46,7 +41,6 @@ void hrms_communication_hub_init(void) {
     hrms_nrf24l01_configure(&config);
     hrms_nrf24l01_start_listening();   // Start in receive mode
   }
-#endif
 
   // Future: Initialize LoRa SX1278 when enabled
 }
@@ -59,7 +53,6 @@ bool hrms_communication_hub_send(const hrms_comm_packet_t *packet) {
   bool success = false;
   
   // Try to send via enabled communication modules
-#if HRMS_ENABLED_NRF24L01
   // Prepare packet for transmission
   uint8_t tx_buffer[sizeof(hrms_comm_packet_t)];
   memcpy(tx_buffer, packet, sizeof(hrms_comm_packet_t));
@@ -68,7 +61,6 @@ bool hrms_communication_hub_send(const hrms_comm_packet_t *packet) {
   hrms_nrf24l01_stop_listening();
   success = hrms_nrf24l01_send(tx_buffer, sizeof(hrms_comm_packet_t));
   hrms_nrf24l01_start_listening();
-#endif
 
   // Update statistics
   if (success) {
@@ -89,7 +81,6 @@ bool hrms_communication_hub_receive(hrms_comm_packet_t *packet) {
   bool received = false;
   
   // Check enabled communication modules for received data
-#if HRMS_ENABLED_NRF24L01
   if (hrms_nrf24l01_available()) {
     uint8_t rx_buffer[sizeof(hrms_comm_packet_t)];
     uint8_t received_bytes = hrms_nrf24l01_receive(rx_buffer, sizeof(rx_buffer));
@@ -107,7 +98,6 @@ bool hrms_communication_hub_receive(hrms_comm_packet_t *packet) {
       }
     }
   }
-#endif
 
   return received;
 }
@@ -116,9 +106,7 @@ void hrms_communication_hub_process(void) {
   // Periodic processing tasks
   
   // Clear any interrupt flags
-#if HRMS_ENABLED_NRF24L01
   hrms_nrf24l01_clear_interrupts();
-#endif
 
   // Future: Add periodic tasks like heartbeats, retransmissions, etc.
 }
@@ -192,4 +180,3 @@ bool hrms_communication_hub_verify_checksum(const hrms_comm_packet_t *packet) {
   return (packet->checksum == expected_checksum);
 }
 
-#endif /* HRMS_ENABLED_COMMUNICATION_HUB */

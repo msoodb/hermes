@@ -8,7 +8,6 @@
  */
 
 #include "hrms_config.h"
-#if HRMS_ENABLED_OLED
 
 #include "hrms_oled.h"
 #include "hrms_i2c1.h"
@@ -181,4 +180,3 @@ void hrms_oled_scroll_text(const char *text, uint8_t speed_ms) { (void)text; (vo
 void hrms_oled_scroll_horizontal(const char *text, uint8_t speed) { (void)text; (void)speed; }
 void hrms_oled_blink(uint8_t times, uint16_t delay_ms) { (void)times; (void)delay_ms; }
 
-#endif /* HRMS_ENABLED_OLED */

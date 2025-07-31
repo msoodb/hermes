@@ -102,10 +102,6 @@ typedef struct {
 } hrms_imu_data_t;
 
 typedef struct {
-  uint16_t distance_mm;
-} hrms_ultrasonic_data_t;
-
-typedef struct {
   uint16_t raw_value;  // raw ADC reading from potentiometer (0-4095)
 } hrms_potentiometer_data_t;
 
@@ -149,7 +145,6 @@ typedef struct {
 
 
 typedef struct {
-  hrms_ultrasonic_data_t ultrasonic;
   hrms_imu_data_t imu;
   hrms_temperature_data_t temperature;
   hrms_potentiometer_data_t potentiometer;

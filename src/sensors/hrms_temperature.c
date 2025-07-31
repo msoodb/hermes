@@ -9,7 +9,6 @@
  */
 
 #include "hrms_config.h"
-#if HRMS_ENABLED_TEMPERATURE
 
 #include "hrms_temperature.h"
 #include "hrms_adc.h"
@@ -46,4 +45,3 @@ bool hrms_temperature_read(hrms_temperature_data_t *temp) {
   return true;
 }
 
-#endif /* HRMS_ENABLED_TEMPERATURE */

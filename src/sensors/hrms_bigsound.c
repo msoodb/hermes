@@ -1,6 +1,5 @@
 
 #include "hrms_config.h"
-#if HRMS_ENABLED_BIGSOUND
 
 #include "hrms_bigsound.h"
 #include "FreeRTOS.h"
@@ -55,4 +54,3 @@ void hrms_bigsound_init(QueueHandle_t controller_queue) {
   NVIC_EnableIRQ(EXTI9_5_IRQn);
 }
 
-#endif /* HRMS_ENABLED_BIGSOUND */

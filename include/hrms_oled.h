@@ -1,8 +1,6 @@
 
 #include "hrms_config.h"
 
-#if HRMS_ENABLED_OLED
-
 #ifndef HRMS_OLED_H
 #define HRMS_OLED_H
 
@@ -25,5 +23,3 @@ void hrms_oled_blink(uint8_t times, uint16_t delay_ms);
 void hrms_oled_apply(const hrms_oled_command_t *cmd);
 
 #endif
-
-#endif /* HRMS_ENABLED_OLED */

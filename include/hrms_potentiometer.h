@@ -1,7 +1,5 @@
 #include "hrms_config.h"
 
-#if HRMS_ENABLED_POTENTIOMETER
-
 #ifndef HRMS_POTENTIOMETER_H
 #define HRMS_POTENTIOMETER_H
 
@@ -20,5 +18,3 @@ void hrms_potentiometer_init(void);
 bool hrms_potentiometer_read(hrms_potentiometer_data_t *data);
 
 #endif /* HRMS_POTENTIOMETER_H */
-
-#endif /* HRMS_ENABLED_POTENTIOMETER */

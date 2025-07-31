@@ -9,8 +9,6 @@
 
 #include "hrms_config.h"
 
-#if HRMS_ENABLED_DISPLAY
-
 #ifndef HRMS_DISPLAY_H
 #define HRMS_DISPLAY_H
 
@@ -24,5 +22,3 @@ void hrms_display_startup_sequence(void);
 void hrms_display_apply(const hrms_display_command_t *cmd);
 
 #endif // HRMS_DISPLAY_H
-
-#endif /* HRMS_ENABLED_DISPLAY */

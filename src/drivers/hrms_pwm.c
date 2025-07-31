@@ -10,8 +10,6 @@
 #include "hrms_pwm.h"
 #include "hrms_config.h"
 
-#if HRMS_ENABLED_SERVO
-
 #include "stm32f1xx.h"
 #include "hrms_pins.h"
 #include "hrms_gpio.h"
@@ -132,4 +130,3 @@ void hrms_pwm_generate_cycle(void) {
   }
 }
 
-#endif /* HRMS_ENABLED_SERVO */

@@ -9,7 +9,6 @@
  */
 
 #include "hrms_config.h"
-#if HRMS_ENABLED_LED
 
 #include "hrms_led.h"
 #include "FreeRTOS.h"
@@ -119,4 +118,3 @@ static void vLedTask(void *pvParameters) {
   }
 }
 
-#endif /* HRMS_ENABLED_LED */

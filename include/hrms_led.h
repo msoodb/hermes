@@ -10,8 +10,6 @@
 
 #include "hrms_config.h"
 
-#if HRMS_ENABLED_LED
-
 #ifndef HRMS_LED_H
 #define HRMS_LED_H
 
@@ -21,5 +19,3 @@ void hrms_led_init(void);
 void hrms_led_apply(const hrms_led_command_t *cmd);
 
 #endif /* HRMS_ALARM_H */
-
-#endif /* HRMS_ENABLED_LED */

@@ -10,8 +10,6 @@
 
 #include "hrms_config.h"
 
-#if HRMS_ENABLED_MOTOR
-
 #ifndef HRMS_MOTOR_H
 #define HRMS_MOTOR_H
 
@@ -21,6 +19,4 @@ void hrms_motor_init(void);
 void hrms_motor_apply(const hrms_motor_command_t *cmd);
 
 #endif // HRMS_MOTOR_H
-
-#endif /* HRMS_ENABLED_MOTOR */
 

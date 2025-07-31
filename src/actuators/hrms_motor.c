@@ -9,7 +9,6 @@
  */
 
 #include "hrms_config.h"
-#if HRMS_ENABLED_MOTOR
 
 #include "hrms_motor.h"
 #include "hrms_gpio.h"
@@ -91,4 +90,3 @@ static void hrms_motor_set_side(const hrms_single_motor_command_t *cmd, bool is_
   *pwm_ccr = (cmd->speed > 255) ? 255 : cmd->speed;
 }
 
-#endif /* HRMS_ENABLED_MOTOR */

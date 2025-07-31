@@ -12,8 +12,6 @@
 
 #include "hrms_config.h"
 
-#if HRMS_ENABLED_COMMUNICATION_HUB
-
 #include "hrms_types.h"
 #include <stdbool.h>
 #include <stdint.h>
@@ -68,7 +66,5 @@ void hrms_communication_hub_set_checksum(hrms_comm_packet_t *packet);
  * @return true if checksum is valid, false otherwise
  */
 bool hrms_communication_hub_verify_checksum(const hrms_comm_packet_t *packet);
-
-#endif /* HRMS_ENABLED_COMMUNICATION_HUB */
 
 #endif /* HRMS_COMMUNICATION_HUB_H */

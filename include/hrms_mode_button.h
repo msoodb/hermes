@@ -10,8 +10,6 @@
 
 #include "hrms_config.h"
 
-#if HRMS_ENABLED_MODE_BUTTON
-
 #ifndef HRMS_MODE_BUTTON_H
 #define HRMS_MODE_BUTTON_H
 
@@ -25,5 +23,3 @@
 void hrms_mode_button_init(QueueHandle_t controller_queue);
 
 #endif // HRMS_MODE_BUTTON_H
-
-#endif /* HRMS_ENABLED_MODE_BUTTON */

@@ -8,7 +8,6 @@
  */
 
 #include "hrms_config.h"
-#if HRMS_ENABLED_DISPLAY
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -135,4 +134,3 @@ static void safe_delay_ms(uint32_t ms) {
   }
 }
 
-#endif /* HRMS_ENABLED_DISPLAY */

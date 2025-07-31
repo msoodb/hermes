@@ -8,7 +8,6 @@
  */
 
 #include "hrms_config.h"
-#if HRMS_ENABLED_SERVO
 
 #include "hrms_servomotor.h"
 #include "hrms_pwm.h"
@@ -116,4 +115,3 @@ void hrms_servomotor_apply(uint8_t servo_id, const hrms_servomotor_command_t *cm
   }
 }
 
-#endif /* HRMS_ENABLED_SERVO */

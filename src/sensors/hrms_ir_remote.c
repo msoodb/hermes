@@ -19,7 +19,6 @@
 // ===============================================================
 
 #include "hrms_config.h"
-#if HRMS_ENABLED_IR_REMOTE
 
 #include "hrms_ir_remote.h"
 #include "FreeRTOS.h"
@@ -229,4 +228,3 @@ void hrms_ir_remote_init(QueueHandle_t controller_queue) {
   NVIC_EnableIRQ(EXTI9_5_IRQn);
 }
 
-#endif /* HRMS_ENABLED_IR_REMOTE */

@@ -9,8 +9,6 @@
 
 #include "hrms_config.h"
 
-#if HRMS_ENABLED_NRF24L01
-
 #include "hrms_nrf24l01.h"
 #include "hrms_pins.h"
 #include "hrms_gpio.h"
@@ -337,4 +335,3 @@ static void nrf24l01_write_register_multi(uint8_t reg, const uint8_t *data, uint
   nrf24l01_cs_high();
 }
 
-#endif /* HRMS_ENABLED_NRF24L01 */

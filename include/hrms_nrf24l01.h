@@ -12,8 +12,6 @@
 
 #include "hrms_config.h"
 
-#if HRMS_ENABLED_NRF24L01
-
 #include "hrms_types.h"
 #include <stdbool.h>
 #include <stdint.h>
@@ -166,7 +164,5 @@ void hrms_nrf24l01_power_down(void);
  * @brief Power up the module
  */
 void hrms_nrf24l01_power_up(void);
-
-#endif /* HRMS_ENABLED_NRF24L01 */
 
 #endif /* HRMS_NRF24L01_H */

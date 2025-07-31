@@ -10,8 +10,6 @@
 
 #include "hrms_config.h"
 
-#if HRMS_ENABLED_TEMPERATURE
-
 #ifndef HRMS_TEMPERATURE_H
 #define HRMS_TEMPERATURE_H
 
@@ -22,5 +20,3 @@ void hrms_temperature_init(void);
 bool hrms_temperature_read(hrms_temperature_data_t *temp);
 
 #endif // HRMS_TEMPERATURE_H
-
-#endif /* HRMS_ENABLED_TEMPERATURE */

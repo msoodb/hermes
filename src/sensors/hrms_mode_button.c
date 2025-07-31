@@ -10,7 +10,6 @@
  */
 
 #include "hrms_config.h"
-#if HRMS_ENABLED_MODE_BUTTON
 
 #include "hrms_mode_button.h"
 #include "FreeRTOS.h"
@@ -75,4 +74,3 @@ void hrms_mode_button_init(QueueHandle_t controller_queue) {
   NVIC_EnableIRQ(EXTI4_IRQn);
 }
 
-#endif /* HRMS_ENABLED_MODE_BUTTON */

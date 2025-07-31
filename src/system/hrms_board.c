@@ -16,18 +16,14 @@
 #include "hrms_adc.h"
 #include "hrms_delay.h"
 #include "hrms_config.h"
-#if HRMS_ENABLED_SERVO
 #include "hrms_pwm.h"
-#endif
 
 void hrms_board_init(void) {
   hrms_clock_init();    // System clocks
   hrms_gpio_init();     // All GPIO modes
 
   // Peripheral inits
-#if HRMS_ENABLED_SERVO
   hrms_pwm_init();
-#endif
   hrms_uart_init();
   hrms_i2c1_init();
   hrms_adc_init();

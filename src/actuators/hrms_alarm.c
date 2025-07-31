@@ -9,7 +9,6 @@
  */
 
 #include "hrms_config.h"
-#if HRMS_ENABLED_ALARM
 
 #include "hrms_alarm.h"
 
@@ -42,4 +41,3 @@ void hrms_alarm_apply(const hrms_alarm_command_t *cmd) {
   }
 }
 
-#endif /* HRMS_ENABLED_ALARM */

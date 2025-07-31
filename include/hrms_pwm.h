@@ -14,15 +14,11 @@
 #include <stdint.h>
 #include "hrms_config.h"
 
-#if HRMS_ENABLED_SERVO
-
 #define HRMS_PWM_MAX_CHANNELS 4
 
 void hrms_pwm_init(void);
 void hrms_pwm_set_pulse_us(uint8_t channel, uint16_t us);
 void hrms_pwm_generate_cycle(void);
-
-#endif /* HRMS_ENABLED_SERVO */
 
 #endif // HRMS_PWM_H
 

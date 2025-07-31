@@ -5,7 +5,6 @@
  */
 
 #include "hrms_config.h"
-#if HRMS_ENABLED_POTENTIOMETER
 
 #include "hrms_potentiometer.h"
 #include "hrms_adc.h"
@@ -30,4 +29,3 @@ bool hrms_potentiometer_read(hrms_potentiometer_data_t *data) {
   return true;
 }
 
-#endif /* HRMS_ENABLED_POTENTIOMETER */

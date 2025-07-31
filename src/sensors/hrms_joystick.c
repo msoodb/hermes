@@ -9,8 +9,6 @@
 
 #include "hrms_config.h"
 
-#if HRMS_ENABLED_JOYSTICK
-
 #include "hrms_joystick.h"
 #include "hrms_pins.h"
 #include "hrms_gpio.h"
@@ -99,4 +97,3 @@ void hrms_joystick_check_events(hrms_joystick_event_t *event) {
   last_button_state = current_button;
 }
 
-#endif /* HRMS_ENABLED_JOYSTICK */
