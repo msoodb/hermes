@@ -8,8 +8,8 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_STEPMOTOR_H
-#define BLFM_STEPMOTOR_H
+#ifndef HRMS_STEPMOTOR_H
+#define HRMS_STEPMOTOR_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -18,6 +18,6 @@
 // === API ===
 void hrms_stepmotor_init(void);
 void hrms_stepmotor_apply(hrms_stepmotor_id_t id, const hrms_stepmotor_command_t *cmd);
-void hrms_stepmotor_apply_all(const hrms_stepmotor_command_t cmds[BLFM_STEPMOTOR_COUNT]);
+void hrms_stepmotor_apply_all(const hrms_stepmotor_command_t cmds[HRMS_STEPMOTOR_COUNT]);
 
-#endif // BLFM_STEPMOTOR_H
+#endif // HRMS_STEPMOTOR_H

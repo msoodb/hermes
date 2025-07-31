@@ -8,8 +8,8 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_SAFETY_H
-#define BLFM_SAFETY_H
+#ifndef HRMS_SAFETY_H
+#define HRMS_SAFETY_H
 
 #include <stdint.h>
 
@@ -17,5 +17,5 @@ void hrms_safety_init(void);
 void hrms_safety_check(void);
 int hrms_safety_get_status(void);
 
-#endif // BLFM_SAFETY_H
+#endif // HRMS_SAFETY_H
 

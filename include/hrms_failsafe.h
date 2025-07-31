@@ -8,10 +8,10 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_FAILSAFE_H
-#define BLFM_FAILSAFE_H
+#ifndef HRMS_FAILSAFE_H
+#define HRMS_FAILSAFE_H
 
 void hrms_failsafe_dummy(void);
 
-#endif // BLFM_FAILSAFE_H
+#endif // HRMS_FAILSAFE_H
 

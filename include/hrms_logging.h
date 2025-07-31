@@ -8,8 +8,8 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_LOGGING_H
-#define BLFM_LOGGING_H
+#ifndef HRMS_LOGGING_H
+#define HRMS_LOGGING_H
 
 #include <stdarg.h>
 #include <stdint.h>
@@ -17,5 +17,5 @@
 void hrms_logging_init(void);
 void hrms_logging_log(const char *format, ...);
 
-#endif // BLFM_LOGGING_H
+#endif // HRMS_LOGGING_H
 

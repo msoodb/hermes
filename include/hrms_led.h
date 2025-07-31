@@ -10,16 +10,16 @@
 
 #include "hrms_config.h"
 
-#if BLFM_ENABLED_LED
+#if HRMS_ENABLED_LED
 
-#ifndef BLFM_LED_H
-#define BLFM_LED_H
+#ifndef HRMS_LED_H
+#define HRMS_LED_H
 
 #include "hrms_types.h"
 
 void hrms_led_init(void);
 void hrms_led_apply(const hrms_led_command_t *cmd);
 
-#endif /* BLFM_ALARM_H */
+#endif /* HRMS_ALARM_H */
 
-#endif /* BLFM_ENABLED_LED */
+#endif /* HRMS_ENABLED_LED */

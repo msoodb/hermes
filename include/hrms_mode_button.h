@@ -10,10 +10,10 @@
 
 #include "hrms_config.h"
 
-#if BLFM_ENABLED_MODE_BUTTON
+#if HRMS_ENABLED_MODE_BUTTON
 
-#ifndef BLFM_MODE_BUTTON_H
-#define BLFM_MODE_BUTTON_H
+#ifndef HRMS_MODE_BUTTON_H
+#define HRMS_MODE_BUTTON_H
 
 #include "FreeRTOS.h"
 #include "queue.h"
@@ -24,6 +24,6 @@
 
 void hrms_mode_button_init(QueueHandle_t controller_queue);
 
-#endif // BLFM_MODE_BUTTON_H
+#endif // HRMS_MODE_BUTTON_H
 
-#endif /* BLFM_ENABLED_MODE_BUTTON */
+#endif /* HRMS_ENABLED_MODE_BUTTON */

@@ -11,38 +11,38 @@
 #include "hrms_config.h"
 #include "hrms_sensor_hub.h"
 
-#if BLFM_ENABLED_ULTRASONIC
+#if HRMS_ENABLED_ULTRASONIC
 #include "hrms_ultrasonic.h"
 #endif
 
-#if BLFM_ENABLED_POTENTIOMETER
+#if HRMS_ENABLED_POTENTIOMETER
 #include "hrms_potentiometer.h"
 #endif
 
-#if BLFM_ENABLED_TEMPERATURE
+#if HRMS_ENABLED_TEMPERATURE
 #include "hrms_temperature.h"
 #endif
 
-#if BLFM_ENABLED_JOYSTICK
+#if HRMS_ENABLED_JOYSTICK
 #include "hrms_joystick.h"
 #endif
 
 #include <stdbool.h>
 
 void hrms_sensor_hub_init(void) {
-#if BLFM_ENABLED_ULTRASONIC
+#if HRMS_ENABLED_ULTRASONIC
   hrms_ultrasonic_init();
 #endif
 
-#if BLFM_ENABLED_POTENTIOMETER
+#if HRMS_ENABLED_POTENTIOMETER
   hrms_potentiometer_init();
 #endif
 
-#if BLFM_ENABLED_TEMPERATURE
+#if HRMS_ENABLED_TEMPERATURE
   hrms_temperature_init();
 #endif
 
-#if BLFM_ENABLED_JOYSTICK
+#if HRMS_ENABLED_JOYSTICK
   hrms_joystick_init();
 #endif
 }
@@ -54,19 +54,19 @@ bool hrms_sensor_hub_read(hrms_sensor_data_t *out) {
 
   bool ok = true;
 
-#if BLFM_ENABLED_ULTRASONIC
+#if HRMS_ENABLED_ULTRASONIC
   ok &= hrms_ultrasonic_read(&out->ultrasonic);
 #endif
 
-#if BLFM_ENABLED_POTENTIOMETER
+#if HRMS_ENABLED_POTENTIOMETER
   ok &= hrms_potentiometer_read(&out->potentiometer);
 #endif
 
-#if BLFM_ENABLED_TEMPERATURE
+#if HRMS_ENABLED_TEMPERATURE
   ok &= hrms_temperature_read(&out->temperature);
 #endif
 
-#if BLFM_ENABLED_JOYSTICK
+#if HRMS_ENABLED_JOYSTICK
   hrms_joystick_read(&out->joystick);  // Always succeeds, no need to check ok
 #else
   // Initialize joystick data to zero when disabled

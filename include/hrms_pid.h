@@ -8,10 +8,10 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_PID_H
-#define BLFM_PID_H
+#ifndef HRMS_PID_H
+#define HRMS_PID_H
 
 void hrms_pid_dummy(void);
 
-#endif // BLFM_PID_H
+#endif // HRMS_PID_H
 

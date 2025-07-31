@@ -8,7 +8,7 @@
  */
 
 #include "hrms_config.h"
-#if BLFM_ENABLED_SERVO
+#if HRMS_ENABLED_SERVO
 
 #include "hrms_servomotor.h"
 #include "hrms_pwm.h"
@@ -85,7 +85,7 @@ void hrms_servomotor_init(void) {
   
   // Initialize all servo states
   for (uint8_t i = 0; i < SERVO_MAX_SERVOS; i++) {
-    servo_states[i].type = BLFM_SERVO_TYPE_MANUAL;
+    servo_states[i].type = HRMS_SERVO_TYPE_MANUAL;
     servo_states[i].reverse_direction = false;
   }
   
@@ -102,13 +102,13 @@ void hrms_servomotor_apply(uint8_t servo_id, const hrms_servomotor_command_t *cm
   if (!cmd || servo_id >= SERVO_MAX_SERVOS) return;
   
   switch (servo_states[servo_id].type) {
-    case BLFM_SERVO_TYPE_MANUAL:
+    case HRMS_SERVO_TYPE_MANUAL:
       process_manual_servo(servo_id, cmd);
       break;
-    case BLFM_SERVO_TYPE_PROPORTIONAL:
+    case HRMS_SERVO_TYPE_PROPORTIONAL:
       process_proportional_servo(servo_id, cmd);
       break;
-    case BLFM_SERVO_TYPE_STATIC:
+    case HRMS_SERVO_TYPE_STATIC:
       // Static servo - do nothing
       break;
     default:
@@ -116,4 +116,4 @@ void hrms_servomotor_apply(uint8_t servo_id, const hrms_servomotor_command_t *cm
   }
 }
 
-#endif /* BLFM_ENABLED_SERVO */
+#endif /* HRMS_ENABLED_SERVO */

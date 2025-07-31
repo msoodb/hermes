@@ -7,8 +7,8 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_JOYSTICK_H
-#define BLFM_JOYSTICK_H
+#ifndef HRMS_JOYSTICK_H
+#define HRMS_JOYSTICK_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -23,4 +23,4 @@ void hrms_joystick_init(void);
 void hrms_joystick_read(hrms_joystick_data_t *data);
 void hrms_joystick_check_events(hrms_joystick_event_t *event);
 
-#endif /* BLFM_JOYSTICK_H */
+#endif /* HRMS_JOYSTICK_H */

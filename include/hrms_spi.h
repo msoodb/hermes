@@ -7,8 +7,8 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_SPI_H
-#define BLFM_SPI_H
+#ifndef HRMS_SPI_H
+#define HRMS_SPI_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -18,9 +18,9 @@
  * SPI speed settings
  */
 typedef enum {
-    BLFM_SPI_SPEED_LOW,     // fPCLK/64 = 1.125MHz
-    BLFM_SPI_SPEED_MEDIUM,  // fPCLK/16 = 4.5MHz
-    BLFM_SPI_SPEED_HIGH     // fPCLK/4 = 18MHz
+    HRMS_SPI_SPEED_LOW,     // fPCLK/64 = 1.125MHz
+    HRMS_SPI_SPEED_MEDIUM,  // fPCLK/16 = 4.5MHz
+    HRMS_SPI_SPEED_HIGH     // fPCLK/4 = 18MHz
 } hrms_spi_speed_t;
 
 /**
@@ -85,4 +85,4 @@ void hrms_spi1_set_speed(hrms_spi_speed_t speed);
  */
 void hrms_spi1_deinit(void);
 
-#endif /* BLFM_SPI_H */
+#endif /* HRMS_SPI_H */

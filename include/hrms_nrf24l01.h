@@ -7,12 +7,12 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_NRF24L01_H
-#define BLFM_NRF24L01_H
+#ifndef HRMS_NRF24L01_H
+#define HRMS_NRF24L01_H
 
 #include "hrms_config.h"
 
-#if BLFM_ENABLED_NRF24L01
+#if HRMS_ENABLED_NRF24L01
 
 #include "hrms_types.h"
 #include <stdbool.h>
@@ -167,6 +167,6 @@ void hrms_nrf24l01_power_down(void);
  */
 void hrms_nrf24l01_power_up(void);
 
-#endif /* BLFM_ENABLED_NRF24L01 */
+#endif /* HRMS_ENABLED_NRF24L01 */
 
-#endif /* BLFM_NRF24L01_H */
+#endif /* HRMS_NRF24L01_H */

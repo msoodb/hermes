@@ -8,10 +8,10 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_BOARD_H
-#define BLFM_BOARD_H
+#ifndef HRMS_BOARD_H
+#define HRMS_BOARD_H
 
 void hrms_board_init(void);
 
-#endif // BLFM_BOARD_H
+#endif // HRMS_BOARD_H
 

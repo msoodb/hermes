@@ -8,8 +8,8 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_GPIO_H
-#define BLFM_GPIO_H
+#ifndef HRMS_GPIO_H
+#define HRMS_GPIO_H
 
 #include "stm32f1xx.h"
 
@@ -26,5 +26,5 @@ void hrms_gpio_clear_pin(uint32_t port, uint32_t pin);
 void hrms_gpio_toggle_pin(uint32_t port, uint32_t pin);
 int  hrms_gpio_read_pin(uint32_t port, uint32_t pin);
 
-#endif /* BLFM_GPIO_H */
+#endif /* HRMS_GPIO_H */
 

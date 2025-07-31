@@ -9,7 +9,7 @@
 
 #include "hrms_config.h"
 
-#if BLFM_ENABLED_JOYSTICK
+#if HRMS_ENABLED_JOYSTICK
 
 #include "hrms_joystick.h"
 #include "hrms_pins.h"
@@ -29,11 +29,11 @@ static int16_t last_y_axis = 0;
 
 void hrms_joystick_init(void) {
   // Configure analog pins for VRX and VRY
-  hrms_gpio_config_analog((uint32_t)BLFM_JOYSTICK_VRX_PORT, BLFM_JOYSTICK_VRX_PIN);
-  hrms_gpio_config_analog((uint32_t)BLFM_JOYSTICK_VRY_PORT, BLFM_JOYSTICK_VRY_PIN);
+  hrms_gpio_config_analog((uint32_t)HRMS_JOYSTICK_VRX_PORT, HRMS_JOYSTICK_VRX_PIN);
+  hrms_gpio_config_analog((uint32_t)HRMS_JOYSTICK_VRY_PORT, HRMS_JOYSTICK_VRY_PIN);
   
   // Configure digital pin for SW button (with pull-up)
-  hrms_gpio_config_input_pullup((uint32_t)BLFM_JOYSTICK_SW_PORT, BLFM_JOYSTICK_SW_PIN);
+  hrms_gpio_config_input_pullup((uint32_t)HRMS_JOYSTICK_SW_PORT, HRMS_JOYSTICK_SW_PIN);
 }
 
 void hrms_joystick_read(hrms_joystick_data_t *data) {
@@ -41,10 +41,10 @@ void hrms_joystick_read(hrms_joystick_data_t *data) {
   
   // Read ADC values
   uint16_t vrx_raw, vry_raw;
-  if (hrms_adc_read(BLFM_JOYSTICK_VRX_ADC_CHANNEL, &vrx_raw) != 0) {
+  if (hrms_adc_read(HRMS_JOYSTICK_VRX_ADC_CHANNEL, &vrx_raw) != 0) {
     vrx_raw = JOYSTICK_CENTER_VALUE;  // Default to center if read fails
   }
-  if (hrms_adc_read(BLFM_JOYSTICK_VRY_ADC_CHANNEL, &vry_raw) != 0) {
+  if (hrms_adc_read(HRMS_JOYSTICK_VRY_ADC_CHANNEL, &vry_raw) != 0) {
     vry_raw = JOYSTICK_CENTER_VALUE;  // Default to center if read fails
   }
   
@@ -82,7 +82,7 @@ void hrms_joystick_read(hrms_joystick_data_t *data) {
   data->y_axis = last_y_axis;
   
   // Read button state (active low - pressed = 0)
-  data->button_pressed = !hrms_gpio_read_pin((uint32_t)BLFM_JOYSTICK_SW_PORT, BLFM_JOYSTICK_SW_PIN);
+  data->button_pressed = !hrms_gpio_read_pin((uint32_t)HRMS_JOYSTICK_SW_PORT, HRMS_JOYSTICK_SW_PIN);
 }
 
 void hrms_joystick_check_events(hrms_joystick_event_t *event) {
@@ -99,4 +99,4 @@ void hrms_joystick_check_events(hrms_joystick_event_t *event) {
   last_button_state = current_button;
 }
 
-#endif /* BLFM_ENABLED_JOYSTICK */
+#endif /* HRMS_ENABLED_JOYSTICK */

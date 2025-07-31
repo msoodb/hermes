@@ -8,10 +8,10 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_POWER_H
-#define BLFM_POWER_H
+#ifndef HRMS_POWER_H
+#define HRMS_POWER_H
 
 void hrms_power_dummy(void);
 
-#endif // BLFM_POWER_H
+#endif // HRMS_POWER_H
 

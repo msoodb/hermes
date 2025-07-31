@@ -8,7 +8,7 @@
  */
 
 #include "hrms_config.h"
-#if BLFM_ENABLED_DISPLAY
+#if HRMS_ENABLED_DISPLAY
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -27,12 +27,12 @@ static void safe_delay_ms(uint32_t ms);
 void hrms_display_init(void) {
   RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 
-  hrms_gpio_config_output((uint32_t)BLFM_LCD_RS_PORT, BLFM_LCD_RS_PIN);
-  hrms_gpio_config_output((uint32_t)BLFM_LCD_E_PORT, BLFM_LCD_E_PIN);
-  hrms_gpio_config_output((uint32_t)BLFM_LCD_D4_PORT, BLFM_LCD_D4_PIN);
-  hrms_gpio_config_output((uint32_t)BLFM_LCD_D5_PORT, BLFM_LCD_D5_PIN);
-  hrms_gpio_config_output((uint32_t)BLFM_LCD_D6_PORT, BLFM_LCD_D6_PIN);
-  hrms_gpio_config_output((uint32_t)BLFM_LCD_D7_PORT, BLFM_LCD_D7_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_LCD_RS_PORT, HRMS_LCD_RS_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_LCD_E_PORT, HRMS_LCD_E_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_LCD_D4_PORT, HRMS_LCD_D4_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_LCD_D5_PORT, HRMS_LCD_D5_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_LCD_D6_PORT, HRMS_LCD_D6_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_LCD_D7_PORT, HRMS_LCD_D7_PIN);
 
   // Manual delay for power-on wait (~50ms)
   for (volatile int i = 0; i < 50000; i++)
@@ -81,39 +81,39 @@ void hrms_display_apply(const hrms_display_command_t *cmd) {
 }
 
 static void lcd_pulse_enable(void) {
-  BLFM_LCD_E_PORT->BSRR = (1 << BLFM_LCD_E_PIN); // E high
+  HRMS_LCD_E_PORT->BSRR = (1 << HRMS_LCD_E_PIN); // E high
   for (volatile int i = 0; i < 200; i++)
     __asm__("nop");
-  BLFM_LCD_E_PORT->BRR = (1 << BLFM_LCD_E_PIN); // E low
+  HRMS_LCD_E_PORT->BRR = (1 << HRMS_LCD_E_PIN); // E low
   for (volatile int i = 0; i < 200; i++)
     __asm__("nop");
 }
 
 static void lcd_write_nibble(uint8_t nibble) {
-  BLFM_LCD_E_PORT->BRR = (1 << BLFM_LCD_D4_PIN) | (1 << BLFM_LCD_D5_PIN) | (1 << BLFM_LCD_D6_PIN) |
-                  (1 << BLFM_LCD_D7_PIN);
+  HRMS_LCD_E_PORT->BRR = (1 << HRMS_LCD_D4_PIN) | (1 << HRMS_LCD_D5_PIN) | (1 << HRMS_LCD_D6_PIN) |
+                  (1 << HRMS_LCD_D7_PIN);
 
   if (nibble & 0x01)
-    BLFM_LCD_D4_PORT->BSRR = (1 << BLFM_LCD_D4_PIN);
+    HRMS_LCD_D4_PORT->BSRR = (1 << HRMS_LCD_D4_PIN);
   if (nibble & 0x02)
-    BLFM_LCD_D5_PORT->BSRR = (1 << BLFM_LCD_D5_PIN);
+    HRMS_LCD_D5_PORT->BSRR = (1 << HRMS_LCD_D5_PIN);
   if (nibble & 0x04)
-    BLFM_LCD_D6_PORT->BSRR = (1 << BLFM_LCD_D6_PIN);
+    HRMS_LCD_D6_PORT->BSRR = (1 << HRMS_LCD_D6_PIN);
   if (nibble & 0x08)
-    BLFM_LCD_D7_PORT->BSRR = (1 << BLFM_LCD_D7_PIN);
+    HRMS_LCD_D7_PORT->BSRR = (1 << HRMS_LCD_D7_PIN);
 
   lcd_pulse_enable();
 }
 
 static void hrms_lcd_send_command(uint8_t cmd) {
-  BLFM_LCD_E_PORT->BRR = (1 << BLFM_LCD_RS_PIN); // RS = 0 for command
+  HRMS_LCD_E_PORT->BRR = (1 << HRMS_LCD_RS_PIN); // RS = 0 for command
   lcd_write_nibble(cmd >> 4);
   lcd_write_nibble(cmd & 0x0F);
   safe_delay_ms(2);
 }
 
 static void hrms_lcd_send_data(uint8_t data) {
-  BLFM_LCD_E_PORT->BSRR = (1 << BLFM_LCD_RS_PIN); // RS = 1 for data
+  HRMS_LCD_E_PORT->BSRR = (1 << HRMS_LCD_RS_PIN); // RS = 1 for data
   lcd_write_nibble(data >> 4);
   lcd_write_nibble(data & 0x0F);
   safe_delay_ms(2);
@@ -135,4 +135,4 @@ static void safe_delay_ms(uint32_t ms) {
   }
 }
 
-#endif /* BLFM_ENABLED_DISPLAY */
+#endif /* HRMS_ENABLED_DISPLAY */

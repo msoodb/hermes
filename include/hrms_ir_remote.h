@@ -9,10 +9,10 @@
 
 #include "hrms_config.h"
 
-#if BLFM_ENABLED_IR_REMOTE
+#if HRMS_ENABLED_IR_REMOTE
 
-#ifndef BLFM_IR_REMOTE_H
-#define BLFM_IR_REMOTE_H
+#ifndef HRMS_IR_REMOTE_H
+#define HRMS_IR_REMOTE_H
 
 #include "FreeRTOS.h"
 #include "hrms_types.h"
@@ -22,6 +22,6 @@
 void hrms_ir_remote_init(QueueHandle_t controller_queue);
 void ir_exti_handler(void);
 
-#endif // BLFM_IR_REMOTE_H
+#endif // HRMS_IR_REMOTE_H
 
-#endif /* BLFM_ENABLED_IR_REMOTE */
+#endif /* HRMS_ENABLED_IR_REMOTE */

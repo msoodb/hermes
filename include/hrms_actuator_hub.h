@@ -8,13 +8,13 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_ACTUATOR_HUB_H
-#define BLFM_ACTUATOR_HUB_H
+#ifndef HRMS_ACTUATOR_HUB_H
+#define HRMS_ACTUATOR_HUB_H
 
 #include "hrms_types.h"
 
 void hrms_actuator_hub_init(void);
 void hrms_actuator_hub_apply(const hrms_actuator_command_t *cmd);
 
-#endif // BLFM_ACTUATOR_HUB_H
+#endif // HRMS_ACTUATOR_HUB_H
 

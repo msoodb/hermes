@@ -8,8 +8,8 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_I2C1_H
-#define BLFM_I2C1_H
+#ifndef HRMS_I2C1_H
+#define HRMS_I2C1_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -19,4 +19,4 @@ int hrms_i2c1_write(uint8_t addr, const uint8_t *data, size_t len);
 int hrms_i2c1_write_byte(uint8_t addr, uint8_t reg, uint8_t data);
 int hrms_i2c1_read_bytes(uint8_t addr, uint8_t reg, uint8_t *buf, size_t len);
 
-#endif // BLFM_I2C1_H
+#endif // HRMS_I2C1_H

@@ -10,7 +10,7 @@
  */
 
 #include "hrms_config.h"
-#if BLFM_ENABLED_MODE_BUTTON
+#if HRMS_ENABLED_MODE_BUTTON
 
 #include "hrms_mode_button.h"
 #include "FreeRTOS.h"
@@ -38,13 +38,13 @@ static void mode_button_exti_handler(void) {
 
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-  uint32_t pin_state = hrms_gpio_read_pin((uint32_t)BLFM_MODE_BUTTON_PORT, BLFM_MODE_BUTTON_PIN);
+  uint32_t pin_state = hrms_gpio_read_pin((uint32_t)HRMS_MODE_BUTTON_PORT, HRMS_MODE_BUTTON_PIN);
   hrms_mode_button_event_t event;
 
   if (pin_state) {
-    event.event_type = BLFM_MODE_BUTTON_EVENT_RELEASED;
+    event.event_type = HRMS_MODE_BUTTON_EVENT_RELEASED;
   } else {
-    event.event_type = BLFM_MODE_BUTTON_EVENT_PRESSED;
+    event.event_type = HRMS_MODE_BUTTON_EVENT_PRESSED;
   }
 
   event.timestamp = now;
@@ -57,22 +57,22 @@ void hrms_mode_button_init(QueueHandle_t controller_queue) {
   mode_button_queue = controller_queue;
 
   // Configure as input with Pull‑Up
-  hrms_gpio_config_input_pullup((uint32_t)BLFM_MODE_BUTTON_PORT, BLFM_MODE_BUTTON_PIN);
+  hrms_gpio_config_input_pullup((uint32_t)HRMS_MODE_BUTTON_PORT, HRMS_MODE_BUTTON_PIN);
 
   // EXTI mapping for PA4
-  AFIO->EXTICR[1] &= ~(0xF << (4 * (BLFM_MODE_BUTTON_PIN - 4)));
-  AFIO->EXTICR[1] |= (AFIO_EXTICR2_EXTI4_PA << (4 * (BLFM_MODE_BUTTON_PIN - 4)));
+  AFIO->EXTICR[1] &= ~(0xF << (4 * (HRMS_MODE_BUTTON_PIN - 4)));
+  AFIO->EXTICR[1] |= (AFIO_EXTICR2_EXTI4_PA << (4 * (HRMS_MODE_BUTTON_PIN - 4)));
 
   // Trigger both edges
-  EXTI->IMR |= (1 << BLFM_MODE_BUTTON_PIN);
-  EXTI->RTSR |= (1 << BLFM_MODE_BUTTON_PIN);
-  EXTI->FTSR |= (1 << BLFM_MODE_BUTTON_PIN);
+  EXTI->IMR |= (1 << HRMS_MODE_BUTTON_PIN);
+  EXTI->RTSR |= (1 << HRMS_MODE_BUTTON_PIN);
+  EXTI->FTSR |= (1 << HRMS_MODE_BUTTON_PIN);
 
   // Register callback
-  hrms_exti_register_callback(BLFM_MODE_BUTTON_PIN, mode_button_exti_handler);
+  hrms_exti_register_callback(HRMS_MODE_BUTTON_PIN, mode_button_exti_handler);
 
   // Enable IRQ
   NVIC_EnableIRQ(EXTI4_IRQn);
 }
 
-#endif /* BLFM_ENABLED_MODE_BUTTON */
+#endif /* HRMS_ENABLED_MODE_BUTTON */

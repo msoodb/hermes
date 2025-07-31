@@ -8,8 +8,8 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_MONITORING_H
-#define BLFM_MONITORING_H
+#ifndef HRMS_MONITORING_H
+#define HRMS_MONITORING_H
 
 #include <stdint.h>
 
@@ -17,5 +17,5 @@ void hrms_monitoring_init(void);
 void hrms_monitoring_task(void *params);
 int hrms_monitoring_check_health(void);
 
-#endif // BLFM_MONITORING_H
+#endif // HRMS_MONITORING_H
 

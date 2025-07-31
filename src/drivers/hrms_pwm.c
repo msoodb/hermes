@@ -10,7 +10,7 @@
 #include "hrms_pwm.h"
 #include "hrms_config.h"
 
-#if BLFM_ENABLED_SERVO
+#if HRMS_ENABLED_SERVO
 
 #include "stm32f1xx.h"
 #include "hrms_pins.h"
@@ -21,27 +21,27 @@
 #define PWM_RCC_APB1ENR_MASK RCC_APB1ENR_TIM4EN
 
 // PWM state - simple and direct like the working test
-static volatile uint16_t pulse_widths[BLFM_PWM_MAX_CHANNELS] = {1500, 1500, 1500, 1500};
+static volatile uint16_t pulse_widths[HRMS_PWM_MAX_CHANNELS] = {1500, 1500, 1500, 1500};
 static volatile uint32_t pwm_cycle_counter = 0;
 
 // Channel enabled flags based on individual servo config
-static const bool channel_enabled[BLFM_PWM_MAX_CHANNELS] = {
-#if BLFM_ENABLED_SERVO1
+static const bool channel_enabled[HRMS_PWM_MAX_CHANNELS] = {
+#if HRMS_ENABLED_SERVO1
   true,   // Channel 0 - PA0
 #else
   false,
 #endif
-#if BLFM_ENABLED_SERVO2
+#if HRMS_ENABLED_SERVO2
   true,   // Channel 1 - PA1
 #else
   false,
 #endif
-#if BLFM_ENABLED_SERVO3
+#if HRMS_ENABLED_SERVO3
   true,   // Channel 2 - PA2
 #else
   false,
 #endif
-#if BLFM_ENABLED_SERVO4
+#if HRMS_ENABLED_SERVO4
   true    // Channel 3 - PA3
 #else
   false
@@ -54,11 +54,11 @@ typedef struct {
   uint8_t pin;
 } gpio_pin_config_t;
 
-static const gpio_pin_config_t channel_pins[BLFM_PWM_MAX_CHANNELS] = {
-  {BLFM_SERVO1_PWM_PORT, BLFM_SERVO1_PWM_PIN},  // PA0
-  {BLFM_SERVO2_PWM_PORT, BLFM_SERVO2_PWM_PIN},  // PA1
-  {BLFM_SERVO3_PWM_PORT, BLFM_SERVO3_PWM_PIN},  // PA2
-  {BLFM_SERVO4_PWM_PORT, BLFM_SERVO4_PWM_PIN}   // PA3
+static const gpio_pin_config_t channel_pins[HRMS_PWM_MAX_CHANNELS] = {
+  {HRMS_SERVO1_PWM_PORT, HRMS_SERVO1_PWM_PIN},  // PA0
+  {HRMS_SERVO2_PWM_PORT, HRMS_SERVO2_PWM_PIN},  // PA1
+  {HRMS_SERVO3_PWM_PORT, HRMS_SERVO3_PWM_PIN},  // PA2
+  {HRMS_SERVO4_PWM_PORT, HRMS_SERVO4_PWM_PIN}   // PA3
 };
 
 // No interrupt handler needed - we'll use direct PWM generation like the working test
@@ -69,7 +69,7 @@ void hrms_pwm_init(void) {
   RCC->APB1ENR |= PWM_RCC_APB1ENR_MASK;   // TIM4 clock
 
   // Configure GPIO pins as outputs for enabled channels only
-  for (int i = 0; i < BLFM_PWM_MAX_CHANNELS; i++) {
+  for (int i = 0; i < HRMS_PWM_MAX_CHANNELS; i++) {
     if (channel_enabled[i]) {
       hrms_gpio_config_output((uint32_t)channel_pins[i].port, channel_pins[i].pin);
       hrms_gpio_clear_pin((uint32_t)channel_pins[i].port, channel_pins[i].pin);  // Start LOW
@@ -85,7 +85,7 @@ void hrms_pwm_init(void) {
 }
 
 void hrms_pwm_set_pulse_us(uint8_t channel, uint16_t us) {
-  if (channel >= BLFM_PWM_MAX_CHANNELS || !channel_enabled[channel]) return;
+  if (channel >= HRMS_PWM_MAX_CHANNELS || !channel_enabled[channel]) return;
   
   // Clamp to safe servo range
   if (us < 500) us = 500;
@@ -97,7 +97,7 @@ void hrms_pwm_set_pulse_us(uint8_t channel, uint16_t us) {
 // Generate one PWM cycle for all enabled channels - FIXED for multiple servos
 void hrms_pwm_generate_cycle(void) {
   // Set all enabled channels HIGH simultaneously
-  for (uint8_t i = 0; i < BLFM_PWM_MAX_CHANNELS; i++) {
+  for (uint8_t i = 0; i < HRMS_PWM_MAX_CHANNELS; i++) {
     if (channel_enabled[i]) {
       hrms_gpio_set_pin((uint32_t)channel_pins[i].port, channel_pins[i].pin);
     }
@@ -108,8 +108,8 @@ void hrms_pwm_generate_cycle(void) {
   uint16_t current_time;
   
   // Keep checking and turn off channels at their specific times
-  bool channels_active[BLFM_PWM_MAX_CHANNELS];
-  for (uint8_t i = 0; i < BLFM_PWM_MAX_CHANNELS; i++) {
+  bool channels_active[HRMS_PWM_MAX_CHANNELS];
+  for (uint8_t i = 0; i < HRMS_PWM_MAX_CHANNELS; i++) {
     channels_active[i] = channel_enabled[i];
   }
   
@@ -119,7 +119,7 @@ void hrms_pwm_generate_cycle(void) {
     bool any_active = false;
     
     // Check each channel if it's time to turn LOW
-    for (uint8_t i = 0; i < BLFM_PWM_MAX_CHANNELS; i++) {
+    for (uint8_t i = 0; i < HRMS_PWM_MAX_CHANNELS; i++) {
       if (channels_active[i] && current_time >= pulse_widths[i]) {
         hrms_gpio_clear_pin((uint32_t)channel_pins[i].port, channel_pins[i].pin);
         channels_active[i] = false;
@@ -132,4 +132,4 @@ void hrms_pwm_generate_cycle(void) {
   }
 }
 
-#endif /* BLFM_ENABLED_SERVO */
+#endif /* HRMS_ENABLED_SERVO */

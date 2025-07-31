@@ -8,8 +8,8 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_SENSOR_HUB_H
-#define BLFM_SENSOR_HUB_H
+#ifndef HRMS_SENSOR_HUB_H
+#define HRMS_SENSOR_HUB_H
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -18,5 +18,5 @@
 void hrms_sensor_hub_init();
 bool hrms_sensor_hub_read(hrms_sensor_data_t *out);
 
-#endif // BLFM_SENSOR_HUB_H
+#endif // HRMS_SENSOR_HUB_H
 

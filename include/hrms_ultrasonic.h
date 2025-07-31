@@ -10,10 +10,10 @@
 
 #include "hrms_config.h"
 
-#if BLFM_ENABLED_ULTRASONIC
+#if HRMS_ENABLED_ULTRASONIC
 
-#ifndef BLFM_ULTRASONIC_H
-#define BLFM_ULTRASONIC_H
+#ifndef HRMS_ULTRASONIC_H
+#define HRMS_ULTRASONIC_H
 
 #include "hrms_types.h"
 #include <stdbool.h>
@@ -21,7 +21,7 @@
 void hrms_ultrasonic_init(void);
 bool hrms_ultrasonic_read(hrms_ultrasonic_data_t *data);
 
-#endif // BLFM_ULTRASONIC_H
+#endif // HRMS_ULTRASONIC_H
 
-#endif /* BLFM_ENABLED_ULTRASONIC */
+#endif /* HRMS_ENABLED_ULTRASONIC */
 

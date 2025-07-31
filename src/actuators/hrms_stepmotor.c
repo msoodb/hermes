@@ -23,14 +23,14 @@ typedef struct {
   uint8_t en_pin;
 } hrms_stepmotor_hw_t;
 
-static const hrms_stepmotor_hw_t hw_map[BLFM_STEPMOTOR_COUNT] = {
-  [BLFM_STEPMOTOR_NECK]  = {GPIOA_BASE, 0, GPIOA_BASE, 1, GPIOA_BASE, 2},
-  [BLFM_STEPMOTOR_ELBOW] = {GPIOB_BASE, 3, GPIOB_BASE, 4, GPIOB_BASE, 5},
-  [BLFM_STEPMOTOR_WRIST] = {GPIOC_BASE, 6, GPIOC_BASE, 7, GPIOC_BASE, 8}
+static const hrms_stepmotor_hw_t hw_map[HRMS_STEPMOTOR_COUNT] = {
+  [HRMS_STEPMOTOR_NECK]  = {GPIOA_BASE, 0, GPIOA_BASE, 1, GPIOA_BASE, 2},
+  [HRMS_STEPMOTOR_ELBOW] = {GPIOB_BASE, 3, GPIOB_BASE, 4, GPIOB_BASE, 5},
+  [HRMS_STEPMOTOR_WRIST] = {GPIOC_BASE, 6, GPIOC_BASE, 7, GPIOC_BASE, 8}
 };
 
 void hrms_stepmotor_init(void) {
-  for (int i = 0; i < BLFM_STEPMOTOR_COUNT; ++i) {
+  for (int i = 0; i < HRMS_STEPMOTOR_COUNT; ++i) {
     hrms_gpio_config_output(hw_map[i].step_port, hw_map[i].step_pin);
     hrms_gpio_config_output(hw_map[i].dir_port, hw_map[i].dir_pin);
     hrms_gpio_config_output(hw_map[i].en_port, hw_map[i].en_pin);
@@ -39,7 +39,7 @@ void hrms_stepmotor_init(void) {
 }
 
 void hrms_stepmotor_apply(hrms_stepmotor_id_t id, const hrms_stepmotor_command_t *cmd) {
-  if (!cmd || id >= BLFM_STEPMOTOR_COUNT)
+  if (!cmd || id >= HRMS_STEPMOTOR_COUNT)
     return;
 
   const hrms_stepmotor_hw_t *hw = &hw_map[id];
@@ -67,8 +67,8 @@ void hrms_stepmotor_apply(hrms_stepmotor_id_t id, const hrms_stepmotor_command_t
   }
 }
 
-void hrms_stepmotor_apply_all(const hrms_stepmotor_command_t cmds[BLFM_STEPMOTOR_COUNT]) {
-  for (int i = 0; i < BLFM_STEPMOTOR_COUNT; ++i) {
+void hrms_stepmotor_apply_all(const hrms_stepmotor_command_t cmds[HRMS_STEPMOTOR_COUNT]) {
+  for (int i = 0; i < HRMS_STEPMOTOR_COUNT; ++i) {
     hrms_stepmotor_apply((hrms_stepmotor_id_t)i, &cmds[i]);
   }
 }

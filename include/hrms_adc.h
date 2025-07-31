@@ -8,8 +8,8 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_ADC_H
-#define BLFM_ADC_H
+#ifndef HRMS_ADC_H
+#define HRMS_ADC_H
 
 #include <stdint.h>
 
@@ -26,4 +26,4 @@ void hrms_adc_init(void);
  */
 int hrms_adc_read(uint8_t channel, uint16_t *value);
 
-#endif /* BLFM_ADC_H */
+#endif /* HRMS_ADC_H */

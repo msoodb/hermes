@@ -9,7 +9,7 @@
 
 #include "hrms_config.h"
 
-#if BLFM_ENABLED_NRF24L01
+#if HRMS_ENABLED_NRF24L01
 
 #include "hrms_nrf24l01.h"
 #include "hrms_pins.h"
@@ -36,14 +36,14 @@ static void nrf24l01_write_register_multi(uint8_t reg, const uint8_t *data, uint
 
 bool hrms_nrf24l01_init(void) {
   // Initialize GPIO pins
-  hrms_gpio_config_output((uint32_t)BLFM_NRF24L01_SPI_PORT, BLFM_NRF24L01_NSS_PIN);
-  hrms_gpio_config_output((uint32_t)BLFM_NRF24L01_CE_PORT, BLFM_NRF24L01_CE_PIN);
-  hrms_gpio_config_input_pullup((uint32_t)BLFM_NRF24L01_IRQ_PORT, BLFM_NRF24L01_IRQ_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_NSS_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_NRF24L01_CE_PORT, HRMS_NRF24L01_CE_PIN);
+  hrms_gpio_config_input_pullup((uint32_t)HRMS_NRF24L01_IRQ_PORT, HRMS_NRF24L01_IRQ_PIN);
   
   // Initialize SPI pins
-  hrms_gpio_config_alternate_pushpull((uint32_t)BLFM_NRF24L01_SPI_PORT, BLFM_NRF24L01_SCK_PIN);
-  hrms_gpio_config_alternate_pushpull((uint32_t)BLFM_NRF24L01_SPI_PORT, BLFM_NRF24L01_MISO_PIN);
-  hrms_gpio_config_alternate_pushpull((uint32_t)BLFM_NRF24L01_SPI_PORT, BLFM_NRF24L01_MOSI_PIN);
+  hrms_gpio_config_alternate_pushpull((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_SCK_PIN);
+  hrms_gpio_config_alternate_pushpull((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_MISO_PIN);
+  hrms_gpio_config_alternate_pushpull((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_MOSI_PIN);
   
   // Set initial pin states
   nrf24l01_cs_high();
@@ -298,19 +298,19 @@ static uint8_t nrf24l01_spi_transfer(uint8_t data) {
 }
 
 static void nrf24l01_cs_low(void) {
-  hrms_gpio_clear_pin((uint32_t)BLFM_NRF24L01_SPI_PORT, BLFM_NRF24L01_NSS_PIN);
+  hrms_gpio_clear_pin((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_NSS_PIN);
 }
 
 static void nrf24l01_cs_high(void) {
-  hrms_gpio_set_pin((uint32_t)BLFM_NRF24L01_SPI_PORT, BLFM_NRF24L01_NSS_PIN);
+  hrms_gpio_set_pin((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_NSS_PIN);
 }
 
 static void nrf24l01_ce_low(void) {
-  hrms_gpio_clear_pin((uint32_t)BLFM_NRF24L01_CE_PORT, BLFM_NRF24L01_CE_PIN);
+  hrms_gpio_clear_pin((uint32_t)HRMS_NRF24L01_CE_PORT, HRMS_NRF24L01_CE_PIN);
 }
 
 static void nrf24l01_ce_high(void) {
-  hrms_gpio_set_pin((uint32_t)BLFM_NRF24L01_CE_PORT, BLFM_NRF24L01_CE_PIN);
+  hrms_gpio_set_pin((uint32_t)HRMS_NRF24L01_CE_PORT, HRMS_NRF24L01_CE_PIN);
 }
 
 static uint8_t nrf24l01_read_register(uint8_t reg) {
@@ -337,4 +337,4 @@ static void nrf24l01_write_register_multi(uint8_t reg, const uint8_t *data, uint
   nrf24l01_cs_high();
 }
 
-#endif /* BLFM_ENABLED_NRF24L01 */
+#endif /* HRMS_ENABLED_NRF24L01 */

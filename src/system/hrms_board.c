@@ -16,7 +16,7 @@
 #include "hrms_adc.h"
 #include "hrms_delay.h"
 #include "hrms_config.h"
-#if BLFM_ENABLED_SERVO
+#if HRMS_ENABLED_SERVO
 #include "hrms_pwm.h"
 #endif
 
@@ -25,7 +25,7 @@ void hrms_board_init(void) {
   hrms_gpio_init();     // All GPIO modes
 
   // Peripheral inits
-#if BLFM_ENABLED_SERVO
+#if HRMS_ENABLED_SERVO
   hrms_pwm_init();
 #endif
   hrms_uart_init();

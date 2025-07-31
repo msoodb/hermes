@@ -5,7 +5,7 @@
  */
 
 #include "hrms_config.h"
-#if BLFM_ENABLED_POTENTIOMETER
+#if HRMS_ENABLED_POTENTIOMETER
 
 #include "hrms_potentiometer.h"
 #include "hrms_adc.h"
@@ -22,7 +22,7 @@ bool hrms_potentiometer_read(hrms_potentiometer_data_t *data) {
     return false;
 
   uint16_t raw_value = 0;
-  int ret = hrms_adc_read(BLFM_POTENTIOMETER_ADC_CHANNEL, &raw_value);
+  int ret = hrms_adc_read(HRMS_POTENTIOMETER_ADC_CHANNEL, &raw_value);
   if (ret != 0)
     return false;
 
@@ -30,4 +30,4 @@ bool hrms_potentiometer_read(hrms_potentiometer_data_t *data) {
   return true;
 }
 
-#endif /* BLFM_ENABLED_POTENTIOMETER */
+#endif /* HRMS_ENABLED_POTENTIOMETER */

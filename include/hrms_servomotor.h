@@ -8,12 +8,12 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_SERVOMOTOR_H
-#define BLFM_SERVOMOTOR_H
+#ifndef HRMS_SERVOMOTOR_H
+#define HRMS_SERVOMOTOR_H
 
 #include "hrms_config.h"
 
-#if BLFM_ENABLED_SERVO
+#if HRMS_ENABLED_SERVO
 
 #include <stdint.h>
 #include "hrms_types.h"
@@ -22,6 +22,6 @@ void hrms_servomotor_init(void);
 void hrms_servomotor_set_type(uint8_t servo_id, hrms_servo_type_t type);
 void hrms_servomotor_apply(uint8_t servo_id, const hrms_servomotor_command_t *cmd);
 
-#endif /* BLFM_ENABLED_SERVO */
+#endif /* HRMS_ENABLED_SERVO */
 
-#endif /* BLFM_SERVOMOTOR_H */
+#endif /* HRMS_SERVOMOTOR_H */

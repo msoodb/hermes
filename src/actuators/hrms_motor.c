@@ -9,7 +9,7 @@
  */
 
 #include "hrms_config.h"
-#if BLFM_ENABLED_MOTOR
+#if HRMS_ENABLED_MOTOR
 
 #include "hrms_motor.h"
 #include "hrms_gpio.h"
@@ -24,10 +24,10 @@ static void hrms_motor_set_side(const hrms_single_motor_command_t *cmd, bool is_
 
 void hrms_motor_init(void) {
   // Configure direction pins
-  hrms_gpio_config_output((uint32_t)BLFM_MOTOR_LEFT_IN1_PORT, BLFM_MOTOR_LEFT_IN1_PIN);
-  hrms_gpio_config_output((uint32_t)BLFM_MOTOR_LEFT_IN2_PORT, BLFM_MOTOR_LEFT_IN2_PIN);
-  hrms_gpio_config_output((uint32_t)BLFM_MOTOR_RIGHT_IN1_PORT, BLFM_MOTOR_RIGHT_IN1_PIN);
-  hrms_gpio_config_output((uint32_t)BLFM_MOTOR_RIGHT_IN2_PORT, BLFM_MOTOR_RIGHT_IN2_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_MOTOR_LEFT_IN1_PORT, HRMS_MOTOR_LEFT_IN1_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_MOTOR_LEFT_IN2_PORT, HRMS_MOTOR_LEFT_IN2_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_MOTOR_RIGHT_IN1_PORT, HRMS_MOTOR_RIGHT_IN1_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_MOTOR_RIGHT_IN2_PORT, HRMS_MOTOR_RIGHT_IN2_PIN);
 
   // Enable peripherals
   RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_AFIOEN;
@@ -65,16 +65,16 @@ static void hrms_motor_set_side(const hrms_single_motor_command_t *cmd, bool is_
   volatile uint32_t *pwm_ccr;
 
   if (is_left) {
-    in1_port = BLFM_MOTOR_LEFT_IN1_PORT;
-    in2_port = BLFM_MOTOR_LEFT_IN2_PORT;
-    in1_pin  = BLFM_MOTOR_LEFT_IN1_PIN;
-    in2_pin  = BLFM_MOTOR_LEFT_IN2_PIN;
+    in1_port = HRMS_MOTOR_LEFT_IN1_PORT;
+    in2_port = HRMS_MOTOR_LEFT_IN2_PORT;
+    in1_pin  = HRMS_MOTOR_LEFT_IN1_PIN;
+    in2_pin  = HRMS_MOTOR_LEFT_IN2_PIN;
     pwm_ccr  = &LEFT_PWM_CCR;
   } else {
-    in1_port = BLFM_MOTOR_RIGHT_IN1_PORT;
-    in2_port = BLFM_MOTOR_RIGHT_IN2_PORT;
-    in1_pin  = BLFM_MOTOR_RIGHT_IN1_PIN;
-    in2_pin  = BLFM_MOTOR_RIGHT_IN2_PIN;
+    in1_port = HRMS_MOTOR_RIGHT_IN1_PORT;
+    in2_port = HRMS_MOTOR_RIGHT_IN2_PORT;
+    in1_pin  = HRMS_MOTOR_RIGHT_IN1_PIN;
+    in2_pin  = HRMS_MOTOR_RIGHT_IN2_PIN;
     pwm_ccr  = &RIGHT_PWM_CCR;
   }
 
@@ -91,4 +91,4 @@ static void hrms_motor_set_side(const hrms_single_motor_command_t *cmd, bool is_
   *pwm_ccr = (cmd->speed > 255) ? 255 : cmd->speed;
 }
 
-#endif /* BLFM_ENABLED_MOTOR */
+#endif /* HRMS_ENABLED_MOTOR */

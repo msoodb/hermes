@@ -9,7 +9,7 @@
  */
 
 #include "hrms_config.h"
-#if BLFM_ENABLED_LED
+#if HRMS_ENABLED_LED
 
 #include "hrms_led.h"
 #include "FreeRTOS.h"
@@ -35,10 +35,10 @@ static QueueHandle_t led_command_queue = NULL;
 static TaskHandle_t led_task_handle = NULL;
 
 void hrms_led_init(void) {
-  hrms_gpio_config_output((uint32_t)BLFM_LED_ONBOARD_PORT, BLFM_LED_ONBOARD_PIN);
-  hrms_gpio_config_output((uint32_t)BLFM_LED_EXTERNAL_PORT, BLFM_LED_EXTERNAL_PIN);
-  hrms_gpio_config_output((uint32_t)BLFM_LED_DEBUG_PORT, BLFM_LED_DEBUG_PIN);
-  //hrms_gpio_set_pin((uint32_t)BLFM_LED_DEBUG_PORT, BLFM_LED_DEBUG_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_LED_ONBOARD_PORT, HRMS_LED_ONBOARD_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_LED_EXTERNAL_PORT, HRMS_LED_EXTERNAL_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+  //hrms_gpio_set_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
       
   if (led_command_queue == NULL) {
     led_command_queue =
@@ -61,16 +61,16 @@ void hrms_led_apply(const hrms_led_command_t *cmd) {
 }
 
 static void hrms_led_external_on(void) {
-  hrms_gpio_set_pin((uint32_t)BLFM_LED_EXTERNAL_PORT, BLFM_LED_EXTERNAL_PIN);
+  hrms_gpio_set_pin((uint32_t)HRMS_LED_EXTERNAL_PORT, HRMS_LED_EXTERNAL_PIN);
 }
 
 static void hrms_led_external_off(void) {
-  hrms_gpio_clear_pin((uint32_t)BLFM_LED_EXTERNAL_PORT, BLFM_LED_EXTERNAL_PIN);
+  hrms_gpio_clear_pin((uint32_t)HRMS_LED_EXTERNAL_PORT, HRMS_LED_EXTERNAL_PIN);
 }
 
 static void vLedTask(void *pvParameters) {
   (void)pvParameters;
-  hrms_led_command_t current_cmd = {.mode = BLFM_LED_MODE_OFF,
+  hrms_led_command_t current_cmd = {.mode = HRMS_LED_MODE_OFF,
 				    .blink_speed_ms = 200};
   TickType_t last_toggle_tick = xTaskGetTickCount();
   bool led_state = false;
@@ -84,17 +84,17 @@ static void vLedTask(void *pvParameters) {
     }
 
     switch (current_cmd.mode) {
-    case BLFM_LED_MODE_OFF:
+    case HRMS_LED_MODE_OFF:
       hrms_led_external_off();
       led_state = false;
       break;
 
-    case BLFM_LED_MODE_ON:
+    case HRMS_LED_MODE_ON:
       hrms_led_external_on();
       led_state = true;
       break;
 
-    case BLFM_LED_MODE_BLINK: {
+    case HRMS_LED_MODE_BLINK: {
       TickType_t now = xTaskGetTickCount();
       if ((now - last_toggle_tick) >=
           pdMS_TO_TICKS(current_cmd.blink_speed_ms)) {
@@ -119,4 +119,4 @@ static void vLedTask(void *pvParameters) {
   }
 }
 
-#endif /* BLFM_ENABLED_LED */
+#endif /* HRMS_ENABLED_LED */

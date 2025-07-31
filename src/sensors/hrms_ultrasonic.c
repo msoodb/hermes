@@ -9,7 +9,7 @@
  */
 
 #include "hrms_config.h"
-#if BLFM_ENABLED_ULTRASONIC
+#if HRMS_ENABLED_ULTRASONIC
 
 #include "hrms_ultrasonic.h"
 #include "FreeRTOS.h"
@@ -37,12 +37,12 @@ static bool wait_for_pin(uint32_t port, uint32_t pin, int target_state,
                          uint32_t timeout_ms);
 
 void hrms_ultrasonic_init(void) {
-  hrms_gpio_config_output((uint32_t)BLFM_ULTRASONIC_TRIG_PORT,
-                          BLFM_ULTRASONIC_TRIG_PIN);
-  hrms_gpio_config_input((uint32_t)BLFM_ULTRASONIC_ECHO_PORT,
-                         BLFM_ULTRASONIC_ECHO_PIN);
-  hrms_gpio_clear_pin((uint32_t)BLFM_ULTRASONIC_TRIG_PORT,
-                      BLFM_ULTRASONIC_TRIG_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_ULTRASONIC_TRIG_PORT,
+                          HRMS_ULTRASONIC_TRIG_PIN);
+  hrms_gpio_config_input((uint32_t)HRMS_ULTRASONIC_ECHO_PORT,
+                         HRMS_ULTRASONIC_ECHO_PIN);
+  hrms_gpio_clear_pin((uint32_t)HRMS_ULTRASONIC_TRIG_PORT,
+                      HRMS_ULTRASONIC_TRIG_PIN);
 
   if (!(CoreDebug->DEMCR & CoreDebug_DEMCR_TRCENA_Msk)) {
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
@@ -97,23 +97,23 @@ static bool hrms_ultrasonic_action(hrms_ultrasonic_data_t *data) {
 
   uint32_t start, end, duration;
 
-  hrms_gpio_clear_pin((uint32_t)BLFM_ULTRASONIC_TRIG_PORT,
-                      BLFM_ULTRASONIC_TRIG_PIN);
+  hrms_gpio_clear_pin((uint32_t)HRMS_ULTRASONIC_TRIG_PORT,
+                      HRMS_ULTRASONIC_TRIG_PIN);
   delay_us(2);
-  hrms_gpio_set_pin((uint32_t)BLFM_ULTRASONIC_TRIG_PORT,
-                    BLFM_ULTRASONIC_TRIG_PIN);
+  hrms_gpio_set_pin((uint32_t)HRMS_ULTRASONIC_TRIG_PORT,
+                    HRMS_ULTRASONIC_TRIG_PIN);
   delay_us(10);
-  hrms_gpio_clear_pin((uint32_t)BLFM_ULTRASONIC_TRIG_PORT,
-                      BLFM_ULTRASONIC_TRIG_PIN);
+  hrms_gpio_clear_pin((uint32_t)HRMS_ULTRASONIC_TRIG_PORT,
+                      HRMS_ULTRASONIC_TRIG_PIN);
 
-  if (!wait_for_pin((uint32_t)BLFM_ULTRASONIC_ECHO_PORT,
-                    BLFM_ULTRASONIC_ECHO_PIN, 1, 30)) {
+  if (!wait_for_pin((uint32_t)HRMS_ULTRASONIC_ECHO_PORT,
+                    HRMS_ULTRASONIC_ECHO_PIN, 1, 30)) {
     return false;
   }
 
   start = DWT->CYCCNT;
-  if (!wait_for_pin((uint32_t)BLFM_ULTRASONIC_ECHO_PORT,
-                    BLFM_ULTRASONIC_ECHO_PIN, 0, 30)) {
+  if (!wait_for_pin((uint32_t)HRMS_ULTRASONIC_ECHO_PORT,
+                    HRMS_ULTRASONIC_ECHO_PIN, 0, 30)) {
     return false;
   }
   end = DWT->CYCCNT;
@@ -137,4 +137,4 @@ static void vUltrasonicTask(void *pvParameters) {
   }
 }
 
-#endif /* BLFM_ENABLED_ULTRASONIC */
+#endif /* HRMS_ENABLED_ULTRASONIC */

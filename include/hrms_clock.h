@@ -8,9 +8,9 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_CLOCK_H
-#define BLFM_CLOCK_H
+#ifndef HRMS_CLOCK_H
+#define HRMS_CLOCK_H
 
 void hrms_clock_init(void);
 
-#endif // BLFM_CLOCK_H
+#endif // HRMS_CLOCK_H

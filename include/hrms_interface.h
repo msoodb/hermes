@@ -8,10 +8,10 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_INTERFACE_H
-#define BLFM_INTERFACE_H
+#ifndef HRMS_INTERFACE_H
+#define HRMS_INTERFACE_H
 
 void hrms_interface_dummy(void);
 
-#endif // BLFM_INTERFACE_H
+#endif // HRMS_INTERFACE_H
 

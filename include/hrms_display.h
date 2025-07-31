@@ -9,10 +9,10 @@
 
 #include "hrms_config.h"
 
-#if BLFM_ENABLED_DISPLAY
+#if HRMS_ENABLED_DISPLAY
 
-#ifndef BLFM_DISPLAY_H
-#define BLFM_DISPLAY_H
+#ifndef HRMS_DISPLAY_H
+#define HRMS_DISPLAY_H
 
 #include "hrms_types.h"
 #include <stdint.h>
@@ -23,6 +23,6 @@ void hrms_display_init(void);
 void hrms_display_startup_sequence(void);
 void hrms_display_apply(const hrms_display_command_t *cmd);
 
-#endif // BLFM_DISPLAY_H
+#endif // HRMS_DISPLAY_H
 
-#endif /* BLFM_ENABLED_DISPLAY */
+#endif /* HRMS_ENABLED_DISPLAY */

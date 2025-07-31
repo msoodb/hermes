@@ -8,8 +8,8 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_IMU_H
-#define BLFM_IMU_H
+#ifndef HRMS_IMU_H
+#define HRMS_IMU_H
 
 #include "hrms_types.h"
 #include <stdbool.h>
@@ -17,5 +17,5 @@
 void hrms_imu_init(void);
 bool hrms_imu_read(hrms_imu_data_t *data);
 
-#endif // BLFM_IMU_H
+#endif // HRMS_IMU_H
 

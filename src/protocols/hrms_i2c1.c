@@ -28,8 +28,8 @@ void hrms_i2c1_init(void) {
   RCC->APB1ENR |= RCC_APB1ENR_I2C1EN;
 
   // Pin config
-  uint32_t scl_pos = BLFM_I2C1_SCL_PIN * 4;
-  uint32_t sda_pos = BLFM_I2C1_SDA_PIN * 4;
+  uint32_t scl_pos = HRMS_I2C1_SCL_PIN * 4;
+  uint32_t sda_pos = HRMS_I2C1_SDA_PIN * 4;
 
   GPIOB->CRL &= ~((0xF << scl_pos) | (0xF << sda_pos));
   GPIOB->CRL |= ((0xB << scl_pos) | (0xB << sda_pos)); // Alternate Open-Drain

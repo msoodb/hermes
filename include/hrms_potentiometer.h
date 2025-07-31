@@ -1,9 +1,9 @@
 #include "hrms_config.h"
 
-#if BLFM_ENABLED_POTENTIOMETER
+#if HRMS_ENABLED_POTENTIOMETER
 
-#ifndef BLFM_POTENTIOMETER_H
-#define BLFM_POTENTIOMETER_H
+#ifndef HRMS_POTENTIOMETER_H
+#define HRMS_POTENTIOMETER_H
 
 #include <stdint.h>
 #include "hrms_types.h"
@@ -19,6 +19,6 @@ void hrms_potentiometer_init(void);
  */
 bool hrms_potentiometer_read(hrms_potentiometer_data_t *data);
 
-#endif /* BLFM_POTENTIOMETER_H */
+#endif /* HRMS_POTENTIOMETER_H */
 
-#endif /* BLFM_ENABLED_POTENTIOMETER */
+#endif /* HRMS_ENABLED_POTENTIOMETER */

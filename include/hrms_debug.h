@@ -8,12 +8,12 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_DEBUG_H
-#define BLFM_DEBUG_H
+#ifndef HRMS_DEBUG_H
+#define HRMS_DEBUG_H
 
 void hrms_debug_init(void);
 void test_single_pin_on_port(void);
 void test_all_pins_on_port(void);
 
-#endif // BLFM_DEBUG_H
+#endif // HRMS_DEBUG_H
 

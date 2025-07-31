@@ -9,7 +9,7 @@
 
 #include "hrms_config.h"
 
-#if BLFM_ENABLED_COMMUNICATION_HUB
+#if HRMS_ENABLED_COMMUNICATION_HUB
 
 #include "hrms_communication_hub.h"
 #include "hrms_types.h"
@@ -17,7 +17,7 @@
 #include "task.h"
 #include "libc_stubs.h"
 
-#if BLFM_ENABLED_NRF24L01
+#if HRMS_ENABLED_NRF24L01
 #include "hrms_nrf24l01.h"
 #endif
 
@@ -30,7 +30,7 @@ void hrms_communication_hub_init(void) {
   memset(&comm_stats, 0, sizeof(comm_stats));
   
   // Initialize enabled communication modules
-#if BLFM_ENABLED_NRF24L01
+#if HRMS_ENABLED_NRF24L01
   if (hrms_nrf24l01_init()) {
     // Configure nRF24L01 with default settings
     nrf24l01_config_t config = {
@@ -59,7 +59,7 @@ bool hrms_communication_hub_send(const hrms_comm_packet_t *packet) {
   bool success = false;
   
   // Try to send via enabled communication modules
-#if BLFM_ENABLED_NRF24L01
+#if HRMS_ENABLED_NRF24L01
   // Prepare packet for transmission
   uint8_t tx_buffer[sizeof(hrms_comm_packet_t)];
   memcpy(tx_buffer, packet, sizeof(hrms_comm_packet_t));
@@ -89,7 +89,7 @@ bool hrms_communication_hub_receive(hrms_comm_packet_t *packet) {
   bool received = false;
   
   // Check enabled communication modules for received data
-#if BLFM_ENABLED_NRF24L01
+#if HRMS_ENABLED_NRF24L01
   if (hrms_nrf24l01_available()) {
     uint8_t rx_buffer[sizeof(hrms_comm_packet_t)];
     uint8_t received_bytes = hrms_nrf24l01_receive(rx_buffer, sizeof(rx_buffer));
@@ -116,7 +116,7 @@ void hrms_communication_hub_process(void) {
   // Periodic processing tasks
   
   // Clear any interrupt flags
-#if BLFM_ENABLED_NRF24L01
+#if HRMS_ENABLED_NRF24L01
   hrms_nrf24l01_clear_interrupts();
 #endif
 
@@ -137,7 +137,7 @@ void hrms_communication_hub_create_heartbeat(hrms_comm_packet_t *packet, uint8_t
   memset(packet, 0, sizeof(hrms_comm_packet_t));
   
   packet->packet_id = next_packet_id++;
-  packet->packet_type = BLFM_COMM_PACKET_HEARTBEAT;
+  packet->packet_type = HRMS_COMM_PACKET_HEARTBEAT;
   packet->source_id = source_id;
   packet->dest_id = 0xFF; // Broadcast
   packet->payload_size = 0; // No payload for heartbeat
@@ -192,4 +192,4 @@ bool hrms_communication_hub_verify_checksum(const hrms_comm_packet_t *packet) {
   return (packet->checksum == expected_checksum);
 }
 
-#endif /* BLFM_ENABLED_COMMUNICATION_HUB */
+#endif /* HRMS_ENABLED_COMMUNICATION_HUB */

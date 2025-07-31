@@ -7,8 +7,8 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_EXTI_DISPATCHER_H
-#define BLFM_EXTI_DISPATCHER_H
+#ifndef HRMS_EXTI_DISPATCHER_H
+#define HRMS_EXTI_DISPATCHER_H
 
 #include <stdint.h>
 

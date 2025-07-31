@@ -17,8 +17,8 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_CONTROLLER_H
-#define BLFM_CONTROLLER_H
+#ifndef HRMS_CONTROLLER_H
+#define HRMS_CONTROLLER_H
 
 #include "hrms_types.h"
 
@@ -71,4 +71,4 @@ void hrms_controller_process_bigsound(const hrms_bigsound_event_t *event,
                                       hrms_actuator_command_t *out);
 
 
-#endif /* BLFM_CONTROLLER_H */
+#endif /* HRMS_CONTROLLER_H */

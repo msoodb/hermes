@@ -7,8 +7,8 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_TYPES_H
-#define BLFM_TYPES_H
+#ifndef HRMS_TYPES_H
+#define HRMS_TYPES_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -17,13 +17,13 @@
 // DISPLAY CONSTANTS
 //==============================================================================
 
-#define BLFM_DISPLAY_LINE_LENGTH 17 // 16 chars + '\0'
+#define HRMS_DISPLAY_LINE_LENGTH 17 // 16 chars + '\0'
 
-#define BLFM_OLED_WIDTH 128
-#define BLFM_OLED_HEIGHT 32
-#define BLFM_OLED_PAGES (BLFM_OLED_HEIGHT / 8)
-#define BLFM_OLED_MAX_SMALL_TEXT_LEN 12
-#define BLFM_OLED_MAX_BIG_TEXT_LEN 16
+#define HRMS_OLED_WIDTH 128
+#define HRMS_OLED_HEIGHT 32
+#define HRMS_OLED_PAGES (HRMS_OLED_HEIGHT / 8)
+#define HRMS_OLED_MAX_SMALL_TEXT_LEN 12
+#define HRMS_OLED_MAX_BIG_TEXT_LEN 16
 
 //==============================================================================
 // COMMUNICATION
@@ -31,31 +31,31 @@
 
 // Communication packet types
 typedef enum {
-  BLFM_COMM_PACKET_NONE = 0,
-  BLFM_COMM_PACKET_HEARTBEAT,
-  BLFM_COMM_PACKET_SENSOR_DATA,
-  BLFM_COMM_PACKET_CONTROL_CMD,
-  BLFM_COMM_PACKET_STATUS,
-  BLFM_COMM_PACKET_CONFIG,
-  BLFM_COMM_PACKET_ACK,
-  BLFM_COMM_PACKET_ERROR
+  HRMS_COMM_PACKET_NONE = 0,
+  HRMS_COMM_PACKET_HEARTBEAT,
+  HRMS_COMM_PACKET_SENSOR_DATA,
+  HRMS_COMM_PACKET_CONTROL_CMD,
+  HRMS_COMM_PACKET_STATUS,
+  HRMS_COMM_PACKET_CONFIG,
+  HRMS_COMM_PACKET_ACK,
+  HRMS_COMM_PACKET_ERROR
 } hrms_comm_packet_type_t;
 
 // Communication directions
 typedef enum {
-  BLFM_COMM_DIR_TX = 0,
-  BLFM_COMM_DIR_RX = 1
+  HRMS_COMM_DIR_TX = 0,
+  HRMS_COMM_DIR_RX = 1
 } hrms_comm_direction_t;
 
 // Generic communication packet structure
-#define BLFM_COMM_MAX_PAYLOAD_SIZE 32
+#define HRMS_COMM_MAX_PAYLOAD_SIZE 32
 typedef struct {
   uint8_t packet_id;                           // Unique packet identifier
   hrms_comm_packet_type_t packet_type;         // Type of packet
   uint8_t source_id;                           // Source device ID
   uint8_t dest_id;                             // Destination device ID
   uint8_t payload_size;                        // Size of payload (0-32)
-  uint8_t payload[BLFM_COMM_MAX_PAYLOAD_SIZE]; // Actual data
+  uint8_t payload[HRMS_COMM_MAX_PAYLOAD_SIZE]; // Actual data
   uint16_t checksum;                           // Simple checksum for error detection
   uint32_t timestamp;                          // When packet was created/received
 } hrms_comm_packet_t;
@@ -83,8 +83,8 @@ typedef struct {
 
 // Event definitions
 typedef enum {
-  BLFM_MODE_BUTTON_EVENT_PRESSED,
-  BLFM_MODE_BUTTON_EVENT_RELEASED
+  HRMS_MODE_BUTTON_EVENT_PRESSED,
+  HRMS_MODE_BUTTON_EVENT_RELEASED
 } hrms_mode_button_event_type_t;
 
 typedef struct {
@@ -120,25 +120,25 @@ typedef struct {
 } hrms_joystick_data_t;
 
 typedef enum {
-  BLFM_IR_CMD_NONE = 0,
-  BLFM_IR_CMD_1 = 0x45,
-  BLFM_IR_CMD_2 = 0x46,
-  BLFM_IR_CMD_3 = 0x47,
-  BLFM_IR_CMD_4 = 0x44,
-  BLFM_IR_CMD_5 = 0x40,
-  BLFM_IR_CMD_6 = 0x43,
-  BLFM_IR_CMD_7 = 0x07,
-  BLFM_IR_CMD_8 = 0x15,
-  BLFM_IR_CMD_9 = 0x09,
-  BLFM_IR_CMD_0 = 0x19,
-  BLFM_IR_CMD_STAR = 0x16,
-  BLFM_IR_CMD_HASH = 0x0D,
-  BLFM_IR_CMD_UP = 0x18,
-  BLFM_IR_CMD_DOWN = 0x52,
-  BLFM_IR_CMD_LEFT = 0x08,
-  BLFM_IR_CMD_RIGHT = 0x5A,
-  BLFM_IR_CMD_OK = 0x1C,
-  BLFM_IR_CMD_REPEAT = 0xFFFFFFFF
+  HRMS_IR_CMD_NONE = 0,
+  HRMS_IR_CMD_1 = 0x45,
+  HRMS_IR_CMD_2 = 0x46,
+  HRMS_IR_CMD_3 = 0x47,
+  HRMS_IR_CMD_4 = 0x44,
+  HRMS_IR_CMD_5 = 0x40,
+  HRMS_IR_CMD_6 = 0x43,
+  HRMS_IR_CMD_7 = 0x07,
+  HRMS_IR_CMD_8 = 0x15,
+  HRMS_IR_CMD_9 = 0x09,
+  HRMS_IR_CMD_0 = 0x19,
+  HRMS_IR_CMD_STAR = 0x16,
+  HRMS_IR_CMD_HASH = 0x0D,
+  HRMS_IR_CMD_UP = 0x18,
+  HRMS_IR_CMD_DOWN = 0x52,
+  HRMS_IR_CMD_LEFT = 0x08,
+  HRMS_IR_CMD_RIGHT = 0x5A,
+  HRMS_IR_CMD_OK = 0x1C,
+  HRMS_IR_CMD_REPEAT = 0xFFFFFFFF
 } hrms_ir_command_t;
 
 typedef struct {
@@ -189,19 +189,19 @@ typedef struct {
 } hrms_stepmotor_command_t;
 
 typedef enum {
-  BLFM_STEPMOTOR_NECK = 0,
-  BLFM_STEPMOTOR_ELBOW,
-  BLFM_STEPMOTOR_WRIST,
-  BLFM_STEPMOTOR_COUNT
+  HRMS_STEPMOTOR_NECK = 0,
+  HRMS_STEPMOTOR_ELBOW,
+  HRMS_STEPMOTOR_WRIST,
+  HRMS_STEPMOTOR_COUNT
 } hrms_stepmotor_id_t;
 
 typedef enum {
-  BLFM_SERVO_TYPE_SCANNER = 0,     // Continuous scanning motion
-  BLFM_SERVO_TYPE_TRACKER,         // Position tracking based on sensors
-  BLFM_SERVO_TYPE_MANUAL,          // Manual control only
-  BLFM_SERVO_TYPE_STATIC,          // Fixed position
-  BLFM_SERVO_TYPE_PROPORTIONAL,    // Precise proportional positioning
-  BLFM_SERVO_TYPE_RADAR            // Radar sweep from extreme left to right
+  HRMS_SERVO_TYPE_SCANNER = 0,     // Continuous scanning motion
+  HRMS_SERVO_TYPE_TRACKER,         // Position tracking based on sensors
+  HRMS_SERVO_TYPE_MANUAL,          // Manual control only
+  HRMS_SERVO_TYPE_STATIC,          // Fixed position
+  HRMS_SERVO_TYPE_PROPORTIONAL,    // Precise proportional positioning
+  HRMS_SERVO_TYPE_RADAR            // Radar sweep from extreme left to right
 } hrms_servo_type_t;
 
 typedef struct {
@@ -231,15 +231,15 @@ typedef struct {
 } hrms_servomotor_command_t;
 
 typedef struct {
-  char line1[BLFM_DISPLAY_LINE_LENGTH];
-  char line2[BLFM_DISPLAY_LINE_LENGTH];
+  char line1[HRMS_DISPLAY_LINE_LENGTH];
+  char line2[HRMS_DISPLAY_LINE_LENGTH];
 } hrms_display_command_t;
 
 typedef enum {
-  BLFM_OLED_ICON_NONE = 0,
-  BLFM_OLED_ICON_HEART,
-  BLFM_OLED_ICON_SMILEY,
-  BLFM_OLED_ICON_STAR,
+  HRMS_OLED_ICON_NONE = 0,
+  HRMS_OLED_ICON_HEART,
+  HRMS_OLED_ICON_SMILEY,
+  HRMS_OLED_ICON_STAR,
 } hrms_oled_icon_t;
 
 typedef struct {
@@ -248,9 +248,9 @@ typedef struct {
   hrms_oled_icon_t icon3;  // top-right icon
   hrms_oled_icon_t icon4;  // top-right icon (next to icon3)
 
-  char smalltext1[BLFM_OLED_MAX_SMALL_TEXT_LEN];
-  char bigtext[BLFM_OLED_MAX_BIG_TEXT_LEN];
-  char smalltext2[BLFM_OLED_MAX_SMALL_TEXT_LEN];
+  char smalltext1[HRMS_OLED_MAX_SMALL_TEXT_LEN];
+  char bigtext[HRMS_OLED_MAX_BIG_TEXT_LEN];
+  char smalltext2[HRMS_OLED_MAX_SMALL_TEXT_LEN];
 
   uint8_t invert;          // invert display
   uint8_t progress_percent; // optional progress bar
@@ -265,9 +265,9 @@ typedef struct {
 } hrms_alarm_command_t;
 
 typedef enum {
-  BLFM_LED_MODE_OFF = 0,
-  BLFM_LED_MODE_ON,
-  BLFM_LED_MODE_BLINK,
+  HRMS_LED_MODE_OFF = 0,
+  HRMS_LED_MODE_ON,
+  HRMS_LED_MODE_BLINK,
 } hrms_led_mode_t;
 
 typedef struct {
@@ -294,4 +294,4 @@ typedef struct {
   hrms_stepmotor_command_t stepmotor;
 } hrms_actuator_command_t;
 
-#endif // BLFM_TYPES_H
+#endif // HRMS_TYPES_H

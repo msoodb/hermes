@@ -168,13 +168,13 @@ void hrms_spi1_set_speed(hrms_spi_speed_t speed) {
     
     // Set new baudrate
     switch (speed) {
-        case BLFM_SPI_SPEED_HIGH:   // fPCLK/4 = 18MHz
+        case HRMS_SPI_SPEED_HIGH:   // fPCLK/4 = 18MHz
             SPI1->CR1 |= SPI_CR1_BR_0;
             break;
-        case BLFM_SPI_SPEED_MEDIUM: // fPCLK/16 = 4.5MHz  
+        case HRMS_SPI_SPEED_MEDIUM: // fPCLK/16 = 4.5MHz  
             SPI1->CR1 |= SPI_CR1_BR_1;
             break;
-        case BLFM_SPI_SPEED_LOW:    // fPCLK/64 = 1.125MHz
+        case HRMS_SPI_SPEED_LOW:    // fPCLK/64 = 1.125MHz
             SPI1->CR1 |= SPI_CR1_BR_2 | SPI_CR1_BR_0;
             break;
         default: // Default to medium speed

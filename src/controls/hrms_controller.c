@@ -32,24 +32,24 @@
 
 #define MOTOR_DEFAULT_SPEED 255
 
-#if BLFM_ENABLED_DISPLAY
+#if HRMS_ENABLED_DISPLAY
 static int lcd_mode = 0;
 static int lcd_counter = 0;
 #endif
 
 
-#if BLFM_ENABLED_MOTOR && BLFM_ENABLED_ULTRASONIC
+#if HRMS_ENABLED_MOTOR && HRMS_ENABLED_ULTRASONIC
 static int motor_backward_ticks = 0;
 static int motor_rotate_ticks = 0;
 static int motor_rotate_duration = 0;
 #endif
 
-#if BLFM_ENABLED_DISPLAY || BLFM_ENABLED_OLED
+#if HRMS_ENABLED_DISPLAY || HRMS_ENABLED_OLED
 char num_buf[12];
 #endif
 
 static hrms_system_state_t hrms_system_state = {
-    .current_mode = BLFM_MODE_MANUAL, .motion_state = BLFM_MOTION_STOP};
+    .current_mode = HRMS_MODE_MANUAL, .motion_state = HRMS_MOTION_STOP};
 
 /**
  * Helper: set motor motion from angle (-180 to 180) and speed.
@@ -59,7 +59,7 @@ static void set_motor_motion_by_angle(int angle, int speed,
 
 /* -------------------- Utilities -------------------- */
 
-#if BLFM_ENABLED_ULTRASONIC
+#if HRMS_ENABLED_ULTRASONIC
 static int pseudo_random(int min, int max) {
   static uint32_t seed = 123456789;
   seed = seed * 1664525 + 1013904223;
@@ -67,7 +67,7 @@ static int pseudo_random(int min, int max) {
 }
 #endif
 
-#if BLFM_ENABLED_DISPLAY
+#if HRMS_ENABLED_DISPLAY
 static void uint_to_str(char *buf, uint16_t value) {
   if (value >= 100) {
     buf[0] = '0' + (value / 100) % 10;
@@ -86,23 +86,23 @@ static void uint_to_str(char *buf, uint16_t value) {
 #endif
 
 /* -------------------- Motion Helpers -------------------- */
-#if BLFM_ENABLED_IR_REMOTE
+#if HRMS_ENABLED_IR_REMOTE
 static int motion_state_to_angle(hrms_motion_state_t motion) {
   switch (motion) {
-  case BLFM_MOTION_FORWARD:
-  case BLFM_MOTION_STOP:
+  case HRMS_MOTION_FORWARD:
+  case HRMS_MOTION_STOP:
     return 0;
-  case BLFM_MOTION_BACKWARD:
+  case HRMS_MOTION_BACKWARD:
     return 180;
-  case BLFM_MOTION_ROTATE_RIGHT:
+  case HRMS_MOTION_ROTATE_RIGHT:
     return 90;
-  case BLFM_MOTION_ROTATE_LEFT:
+  case HRMS_MOTION_ROTATE_LEFT:
     return -90;
   default:
     return 0;
   }
 }
-#endif /* BLFM_ENABLED_IR_REMOTE */
+#endif /* HRMS_ENABLED_IR_REMOTE */
 
 /**
  * Map angle (-180 to 180) and speed (0-255) to motor command.
@@ -130,38 +130,38 @@ static void set_motor_motion_by_angle(int angle, int speed,
 
   if (angle > 90) {
     // Hard right spin
-    out->left.direction = BLFM_MOTION_BACKWARD;
-    out->right.direction = BLFM_MOTION_BACKWARD;
+    out->left.direction = HRMS_MOTION_BACKWARD;
+    out->right.direction = HRMS_MOTION_BACKWARD;
     out->left.speed = speed;
     out->right.speed = speed;
   } else if (angle < -90) {
     // Hard left spin
-    out->left.direction = BLFM_MOTION_BACKWARD;
-    out->right.direction = BLFM_MOTION_BACKWARD;
+    out->left.direction = HRMS_MOTION_BACKWARD;
+    out->right.direction = HRMS_MOTION_BACKWARD;
     out->left.speed = speed;
     out->right.speed = speed;
   } else if (angle > 45) {
     // Right turn
-    out->left.direction = BLFM_MOTION_FORWARD;
-    out->right.direction = BLFM_MOTION_BACKWARD;
+    out->left.direction = HRMS_MOTION_FORWARD;
+    out->right.direction = HRMS_MOTION_BACKWARD;
     out->left.speed = speed;
     out->right.speed = speed;
   } else if (angle < -45) {
     // Left turn
-    out->left.direction = BLFM_MOTION_BACKWARD;
-    out->right.direction = BLFM_MOTION_FORWARD;
+    out->left.direction = HRMS_MOTION_BACKWARD;
+    out->right.direction = HRMS_MOTION_FORWARD;
     out->left.speed = speed;
     out->right.speed = speed;
   } else if (angle > -45 && angle < 45) {
     // Forward
-    out->left.direction = BLFM_MOTION_FORWARD;
-    out->right.direction = BLFM_MOTION_FORWARD;
+    out->left.direction = HRMS_MOTION_FORWARD;
+    out->right.direction = HRMS_MOTION_FORWARD;
     out->left.speed = speed;
     out->right.speed = speed;
   } else {
     // fallback stop
-    out->left.direction = BLFM_MOTION_FORWARD;
-    out->right.direction = BLFM_MOTION_FORWARD;
+    out->left.direction = HRMS_MOTION_FORWARD;
+    out->right.direction = HRMS_MOTION_FORWARD;
     out->left.speed = 0;
     out->right.speed = 0;
   }
@@ -175,39 +175,39 @@ void hrms_controller_init(void) {
 
 // --- Mode-setting functions ---
 static void hrms_set_mode_auto(hrms_actuator_command_t *out) {
-  hrms_system_state.current_mode = BLFM_MODE_AUTO;
-  out->led.mode = BLFM_LED_MODE_BLINK;
+  hrms_system_state.current_mode = HRMS_MODE_AUTO;
+  out->led.mode = HRMS_LED_MODE_BLINK;
   out->led.blink_speed_ms = 250;
 }
 
 static void hrms_set_mode_manual(hrms_actuator_command_t *out) {
-  hrms_system_state.current_mode = BLFM_MODE_MANUAL;
-  out->led.mode = BLFM_LED_MODE_OFF;
+  hrms_system_state.current_mode = HRMS_MODE_MANUAL;
+  out->led.mode = HRMS_LED_MODE_OFF;
 }
 
 static void hrms_set_mode_emergency(hrms_actuator_command_t *out) {
-  hrms_system_state.current_mode = BLFM_MODE_EMERGENCY;
-  out->led.mode = BLFM_LED_MODE_ON;
+  hrms_system_state.current_mode = HRMS_MODE_EMERGENCY;
+  out->led.mode = HRMS_LED_MODE_ON;
 }
 
 // --- Public interface to change mode ---
 void hrms_controller_change_mode(hrms_mode_t mode,
                                  hrms_actuator_command_t *out) {
   switch (mode) {
-  case BLFM_MODE_AUTO:
+  case HRMS_MODE_AUTO:
     hrms_set_mode_auto(out);
     break;
-  case BLFM_MODE_MANUAL:
+  case HRMS_MODE_MANUAL:
     hrms_set_mode_manual(out);
     break;
-  case BLFM_MODE_EMERGENCY:
+  case HRMS_MODE_EMERGENCY:
   default:
     hrms_set_mode_emergency(out);
     break;
   }
 
   set_motor_motion_by_angle(0, 0, &out->motor);
-  hrms_system_state.motion_state = BLFM_MOTION_STOP;
+  hrms_system_state.motion_state = HRMS_MOTION_STOP;
 }
 
 void hrms_controller_process(const hrms_sensor_data_t *in,
@@ -216,37 +216,37 @@ void hrms_controller_process(const hrms_sensor_data_t *in,
     return;
 
   //uint16_t led_blink_speed = 100;
-  //hrms_led_mode_t led_mode = BLFM_LED_MODE_BLINK;
+  //hrms_led_mode_t led_mode = HRMS_LED_MODE_BLINK;
 
-#if BLFM_ENABLED_ULTRASONIC
-  if (hrms_system_state.current_mode == BLFM_MODE_AUTO) {
+#if HRMS_ENABLED_ULTRASONIC
+  if (hrms_system_state.current_mode == HRMS_MODE_AUTO) {
     switch (hrms_system_state.motion_state) {
-    case BLFM_MOTION_STOP:
-    case BLFM_MOTION_FORWARD:
+    case HRMS_MOTION_STOP:
+    case HRMS_MOTION_FORWARD:
       if (in->ultrasonic.distance_mm <= ULTRASONIC_FORWARD_THRESH) {
         motor_backward_ticks = 0;
-        hrms_system_state.motion_state = BLFM_MOTION_BACKWARD;
+        hrms_system_state.motion_state = HRMS_MOTION_BACKWARD;
       } else {
         set_motor_motion_by_angle(0, MOTOR_DEFAULT_SPEED, &out->motor);
       }
       break;
 
-    case BLFM_MOTION_BACKWARD:
+    case HRMS_MOTION_BACKWARD:
       set_motor_motion_by_angle(180, MOTOR_DEFAULT_SPEED, &out->motor);
       motor_backward_ticks++;
       if (motor_backward_ticks >= MOTOR_BACKWARD_TICKS_MAX) {
         motor_rotate_ticks = 0;
         motor_rotate_duration =
             pseudo_random(MOTOR_MIN_ROTATE_TICKS, MOTOR_MAX_ROTATE_TICKS);
-        hrms_system_state.motion_state = BLFM_MOTION_ROTATE_LEFT;
+        hrms_system_state.motion_state = HRMS_MOTION_ROTATE_LEFT;
       }
       break;
 
-    case BLFM_MOTION_ROTATE_LEFT:
+    case HRMS_MOTION_ROTATE_LEFT:
       set_motor_motion_by_angle(-90, MOTOR_DEFAULT_SPEED, &out->motor);
       motor_rotate_ticks++;
       if (motor_rotate_ticks >= motor_rotate_duration) {
-        hrms_system_state.motion_state = BLFM_MOTION_FORWARD;
+        hrms_system_state.motion_state = HRMS_MOTION_FORWARD;
       }
       break;
 
@@ -256,9 +256,9 @@ void hrms_controller_process(const hrms_sensor_data_t *in,
     }
   }
 
-#endif /* BLFM_ENABLED_ULTRASONIC */
+#endif /* HRMS_ENABLED_ULTRASONIC */
 
-#if BLFM_ENABLED_ALARM
+#if HRMS_ENABLED_ALARM
   if (in->ultrasonic.distance_mm < 100) {
     out->alarm.active = true;
     out->alarm.pattern_id = 1;
@@ -267,32 +267,32 @@ void hrms_controller_process(const hrms_sensor_data_t *in,
   } else {
     out->alarm.active = false;
   }
-#endif /* BLFM_ENABLED_ALARM */
+#endif /* HRMS_ENABLED_ALARM */
 
-#if BLFM_ENABLED_POTENTIOMETER
+#if HRMS_ENABLED_POTENTIOMETER
   uint16_t pot_val = in->potentiometer.raw_value;
 
-  led_mode = BLFM_LED_MODE_BLINK;
+  led_mode = HRMS_LED_MODE_BLINK;
   led_blink_speed = pot_val; // + (pot_val * (1500 - 200)) / 4095;
 #endif
 
-#if BLFM_ENABLED_LED
+#if HRMS_ENABLED_LED
   //out->led.mode = led_mode;
   //out->led.blink_speed_ms = led_blink_speed;
 #endif
 
 // Initialize servos to center position by default
-#if BLFM_ENABLED_SERVO
+#if HRMS_ENABLED_SERVO
   out->servo1.proportional_input = 0;  // Center position
   out->servo2.proportional_input = 0;  // Center position  
   out->servo3.proportional_input = 0;  // Center position
   out->servo4.proportional_input = 0;  // Center position
 #endif
 
-#if BLFM_ENABLED_JOYSTICK
+#if HRMS_ENABLED_JOYSTICK
   // Process joystick for servo control - all servos move together
-  if (hrms_system_state.current_mode == BLFM_MODE_MANUAL) {
-#if BLFM_ENABLED_SERVO
+  if (hrms_system_state.current_mode == HRMS_MODE_MANUAL) {
+#if HRMS_ENABLED_SERVO
     // Use Y-axis for all servos together (like *, 0, # keys)
     // Only update if joystick moved significantly from center
     if (abs(in->joystick.y_axis) > 100) {  // Deadzone to prevent shaking
@@ -304,7 +304,7 @@ void hrms_controller_process(const hrms_sensor_data_t *in,
     // If joystick is in center deadzone, keep servos at last position (no update)
 #endif
 
-#if BLFM_ENABLED_MOTOR
+#if HRMS_ENABLED_MOTOR
     // Joystick controls motors - X axis for steering, Y axis for speed
     int speed = (in->joystick.y_axis * MOTOR_DEFAULT_SPEED) / 1000;  // Forward/backward
     int steering = in->joystick.x_axis / 10;  // Left/right steering angle
@@ -315,7 +315,7 @@ void hrms_controller_process(const hrms_sensor_data_t *in,
 
 // Multiple servos - no default behavior needed, will be controlled by IR commands
 
-#if BLFM_ENABLED_DISPLAY
+#if HRMS_ENABLED_DISPLAY
   char buf1[17];
   char num_buf[12];
 
@@ -346,22 +346,22 @@ void hrms_controller_process(const hrms_sensor_data_t *in,
   strcpy(out->display.line2, num_buf);
 #endif
 
-#if BLFM_ENABLED_OLED
-  out->oled.icon1 = BLFM_OLED_ICON_NONE;
-  out->oled.icon2 = BLFM_OLED_ICON_NONE;
-  out->oled.icon3 = BLFM_OLED_ICON_SMILEY;
-  out->oled.icon4 = BLFM_OLED_ICON_NONE;
+#if HRMS_ENABLED_OLED
+  out->oled.icon1 = HRMS_OLED_ICON_NONE;
+  out->oled.icon2 = HRMS_OLED_ICON_NONE;
+  out->oled.icon3 = HRMS_OLED_ICON_SMILEY;
+  out->oled.icon4 = HRMS_OLED_ICON_NONE;
 
-  safe_strncpy(out->oled.smalltext1, "Pass", BLFM_OLED_MAX_SMALL_TEXT_LEN);
-  safe_strncpy(out->oled.bigtext, "BELFHYM 2025", BLFM_OLED_MAX_BIG_TEXT_LEN);
-  safe_strncpy(out->oled.smalltext2, "V1", BLFM_OLED_MAX_SMALL_TEXT_LEN);
+  safe_strncpy(out->oled.smalltext1, "Pass", HRMS_OLED_MAX_SMALL_TEXT_LEN);
+  safe_strncpy(out->oled.bigtext, "BELFHYM 2025", HRMS_OLED_MAX_BIG_TEXT_LEN);
+  safe_strncpy(out->oled.smalltext2, "V1", HRMS_OLED_MAX_SMALL_TEXT_LEN);
 
   out->oled.invert = 0;
   out->oled.progress_percent = 100;
 #endif
 }
 
-#if BLFM_ENABLED_IR_REMOTE
+#if HRMS_ENABLED_IR_REMOTE
 void hrms_controller_process_ir_remote(const hrms_ir_remote_event_t *in,
                                        hrms_actuator_command_t *out) {
   if (!in || !out)
@@ -370,62 +370,62 @@ void hrms_controller_process_ir_remote(const hrms_ir_remote_event_t *in,
   int16_t speed = MOTOR_DEFAULT_SPEED;
 
   switch (in->command) {
-  case BLFM_IR_CMD_1:
-    hrms_controller_change_mode(BLFM_MODE_MANUAL, out);
+  case HRMS_IR_CMD_1:
+    hrms_controller_change_mode(HRMS_MODE_MANUAL, out);
     break;
 
-  case BLFM_IR_CMD_2:
-    hrms_controller_change_mode(BLFM_MODE_AUTO, out);
+  case HRMS_IR_CMD_2:
+    hrms_controller_change_mode(HRMS_MODE_AUTO, out);
     break;
 
-  case BLFM_IR_CMD_3:
-    hrms_controller_change_mode(BLFM_MODE_EMERGENCY, out);
+  case HRMS_IR_CMD_3:
+    hrms_controller_change_mode(HRMS_MODE_EMERGENCY, out);
     break;
 
   // Servo1 control (PA0) - Keys 4, 5, 6
-  case BLFM_IR_CMD_4:
+  case HRMS_IR_CMD_4:
     // Servo1 to minimum (-90°)
     out->servo1.proportional_input = -1000;
     break;
-  case BLFM_IR_CMD_5:
+  case HRMS_IR_CMD_5:
     // Servo1 to center (0°)
     out->servo1.proportional_input = 0;
     break;
-  case BLFM_IR_CMD_6:
+  case HRMS_IR_CMD_6:
     // Servo1 to maximum (+90°)
     out->servo1.proportional_input = 1000;
     break;
     
   // Servo2 control (PA1) - Keys 7, 8, 9
-  case BLFM_IR_CMD_7:
+  case HRMS_IR_CMD_7:
     // Servo2 to minimum (-90°)
     out->servo4.proportional_input = -1000;
     break;
-  case BLFM_IR_CMD_8:
+  case HRMS_IR_CMD_8:
     // Servo2 to center (0°)
     out->servo4.proportional_input = 0;
     break;
-  case BLFM_IR_CMD_9:
+  case HRMS_IR_CMD_9:
     // Servo2 to maximum (+90°)
     out->servo4.proportional_input = 1000;
     break;
     
   // All servos control - Keys *, 0, #
-  case BLFM_IR_CMD_STAR:
+  case HRMS_IR_CMD_STAR:
     // All servos to minimum (-90°)
     out->servo1.proportional_input = -1000;
     out->servo2.proportional_input = -1000;
     out->servo3.proportional_input = -1000;
     out->servo4.proportional_input = -1000;
     break;
-  case BLFM_IR_CMD_0:
+  case HRMS_IR_CMD_0:
     // All servos to center (0°)
     out->servo1.proportional_input = 0;
     out->servo2.proportional_input = 0;
     out->servo3.proportional_input = 0;
     out->servo4.proportional_input = 0;
     break;
-  case BLFM_IR_CMD_HASH:
+  case HRMS_IR_CMD_HASH:
     // All servos to maximum (+90°)
     out->servo1.proportional_input = 1000;
     out->servo2.proportional_input = 1000;
@@ -437,69 +437,69 @@ void hrms_controller_process_ir_remote(const hrms_ir_remote_event_t *in,
     break;
   }
 
-  if (hrms_system_state.current_mode != BLFM_MODE_MANUAL)
+  if (hrms_system_state.current_mode != HRMS_MODE_MANUAL)
     return;
 
   switch (in->command) {
-  case BLFM_IR_CMD_UP:
-    hrms_system_state.motion_state = BLFM_MOTION_FORWARD;
+  case HRMS_IR_CMD_UP:
+    hrms_system_state.motion_state = HRMS_MOTION_FORWARD;
     break;
 
-  case BLFM_IR_CMD_DOWN:
-    hrms_system_state.motion_state = BLFM_MOTION_BACKWARD;
+  case HRMS_IR_CMD_DOWN:
+    hrms_system_state.motion_state = HRMS_MOTION_BACKWARD;
     break;
 
-  case BLFM_IR_CMD_LEFT:
-    hrms_system_state.motion_state = BLFM_MOTION_ROTATE_LEFT;
+  case HRMS_IR_CMD_LEFT:
+    hrms_system_state.motion_state = HRMS_MOTION_ROTATE_LEFT;
     break;
 
-  case BLFM_IR_CMD_RIGHT:
-    hrms_system_state.motion_state = BLFM_MOTION_ROTATE_RIGHT;
+  case HRMS_IR_CMD_RIGHT:
+    hrms_system_state.motion_state = HRMS_MOTION_ROTATE_RIGHT;
     break;
 
-  case BLFM_IR_CMD_OK:
+  case HRMS_IR_CMD_OK:
   default:
     speed = 0;
-    hrms_system_state.motion_state = BLFM_MOTION_STOP;
+    hrms_system_state.motion_state = HRMS_MOTION_STOP;
     break;
   }
 
   int angle = motion_state_to_angle(hrms_system_state.motion_state);
   set_motor_motion_by_angle(angle, speed, &out->motor);
 }
-#endif /* BLFM_ENABLED_IR_REMOTE */
+#endif /* HRMS_ENABLED_IR_REMOTE */
 
 
-#if BLFM_ENABLED_MODE_BUTTON
+#if HRMS_ENABLED_MODE_BUTTON
 void hrms_controller_process_mode_button(const hrms_mode_button_event_t *event,
                                          hrms_actuator_command_t *command) {
   static uint32_t last_press_tick = 0;
   (void)command;
 
-  if (event && event->event_type == BLFM_MODE_BUTTON_EVENT_PRESSED) {
+  if (event && event->event_type == HRMS_MODE_BUTTON_EVENT_PRESSED) {
     uint32_t now = xTaskGetTickCount();
     if ((now - last_press_tick) > pdMS_TO_TICKS(MODE_BUTTON_DEBOUNCE_MS)) {
-      hrms_gpio_toggle_pin((uint32_t)BLFM_LED_DEBUG_PORT, BLFM_LED_DEBUG_PIN);
+      hrms_gpio_toggle_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
       last_press_tick = now;
     }
   }
 }
-#endif /* BLFM_ENABLED_MODE_BUTTON */
+#endif /* HRMS_ENABLED_MODE_BUTTON */
 
-#if BLFM_ENABLED_IR_REMOTE
+#if HRMS_ENABLED_IR_REMOTE
 bool hrms_controller_check_ir_timeout(hrms_actuator_command_t *out) {
   (void)out;
   return false;
 }
-#endif /* BLFM_ENABLED_IR_REMOTE */
+#endif /* HRMS_ENABLED_IR_REMOTE */
 
-#if BLFM_ENABLED_BIGSOUND
+#if HRMS_ENABLED_BIGSOUND
 void hrms_controller_process_bigsound(const hrms_bigsound_event_t *event,
                                       hrms_actuator_command_t *out) {
   if (!event || !out)
     return;
   // You can implement this or leave empty
 }
-#endif /* BLFM_ENABLED_BIGSOUND */
+#endif /* HRMS_ENABLED_BIGSOUND */
 
 // ESP32 communication module removed - ready for new implementation

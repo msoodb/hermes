@@ -9,7 +9,7 @@
  */
 
 #include "hrms_config.h"
-#if BLFM_ENABLED_TEMPERATURE
+#if HRMS_ENABLED_TEMPERATURE
 
 #include "hrms_temperature.h"
 #include "hrms_adc.h"
@@ -18,7 +18,7 @@
 
 void hrms_temperature_init(void) {
   // Initialize ADC, if needed
-#if BLFM_TEMPRATURE_DISABLED
+#if HRMS_TEMPRATURE_DISABLED
   return;
 #endif
 
@@ -29,7 +29,7 @@ bool hrms_temperature_read(hrms_temperature_data_t *temp) {
     return false;
 
   uint16_t adc_value = 0;
-  if (hrms_adc_read(BLFM_TEMP_SENSOR_PIN, &adc_value) != 0) {
+  if (hrms_adc_read(HRMS_TEMP_SENSOR_PIN, &adc_value) != 0) {
     return false;
   }
 
@@ -46,4 +46,4 @@ bool hrms_temperature_read(hrms_temperature_data_t *temp) {
   return true;
 }
 
-#endif /* BLFM_ENABLED_TEMPERATURE */
+#endif /* HRMS_ENABLED_TEMPERATURE */

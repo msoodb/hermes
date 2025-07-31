@@ -1,10 +1,10 @@
 
 #include "hrms_config.h"
 
-#if BLFM_ENABLED_OLED
+#if HRMS_ENABLED_OLED
 
-#ifndef BLFM_OLED_H
-#define BLFM_OLED_H
+#ifndef HRMS_OLED_H
+#define HRMS_OLED_H
 
 #include "hrms_types.h"
 #include <stdint.h>
@@ -26,4 +26,4 @@ void hrms_oled_apply(const hrms_oled_command_t *cmd);
 
 #endif
 
-#endif /* BLFM_ENABLED_OLED */
+#endif /* HRMS_ENABLED_OLED */

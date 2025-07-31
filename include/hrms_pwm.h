@@ -8,21 +8,21 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_PWM_H
-#define BLFM_PWM_H
+#ifndef HRMS_PWM_H
+#define HRMS_PWM_H
 
 #include <stdint.h>
 #include "hrms_config.h"
 
-#if BLFM_ENABLED_SERVO
+#if HRMS_ENABLED_SERVO
 
-#define BLFM_PWM_MAX_CHANNELS 4
+#define HRMS_PWM_MAX_CHANNELS 4
 
 void hrms_pwm_init(void);
 void hrms_pwm_set_pulse_us(uint8_t channel, uint16_t us);
 void hrms_pwm_generate_cycle(void);
 
-#endif /* BLFM_ENABLED_SERVO */
+#endif /* HRMS_ENABLED_SERVO */
 
-#endif // BLFM_PWM_H
+#endif // HRMS_PWM_H
 

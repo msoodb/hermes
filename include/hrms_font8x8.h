@@ -1,6 +1,6 @@
 
-#ifndef BLFM_FONT8X8_H
-#define BLFM_FONT8X8_H
+#ifndef HRMS_FONT8X8_H
+#define HRMS_FONT8X8_H
 
 #include <stdint.h>
 

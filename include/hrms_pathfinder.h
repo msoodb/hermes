@@ -8,10 +8,10 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_PATHFINDER_H
-#define BLFM_PATHFINDER_H
+#ifndef HRMS_PATHFINDER_H
+#define HRMS_PATHFINDER_H
 
 void hrms_pathfinder_dummy(void);
 
-#endif // BLFM_PATHFINDER_H
+#endif // HRMS_PATHFINDER_H
 

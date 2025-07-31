@@ -17,7 +17,7 @@
 
 #include "hrms_taskmanager.h"
 #include "hrms_config.h"
-#if BLFM_ENABLED_JOYSTICK
+#if HRMS_ENABLED_JOYSTICK
 #include "hrms_joystick.h"
 #include "hrms_gpio.h"
 #include "hrms_pins.h"
@@ -31,19 +31,19 @@
 #include "hrms_controller.h"
 #include "hrms_sensor_hub.h"
 
-#if BLFM_ENABLED_MODE_BUTTON
+#if HRMS_ENABLED_MODE_BUTTON
 #include "hrms_mode_button.h"
 #endif
 
-#if BLFM_ENABLED_IR_REMOTE
+#if HRMS_ENABLED_IR_REMOTE
 #include "hrms_ir_remote.h"
 #endif
 
-#if BLFM_ENABLED_BIGSOUND
+#if HRMS_ENABLED_BIGSOUND
 #include "hrms_bigsound.h"
 #endif
 
-#if BLFM_ENABLED_COMMUNICATION_HUB
+#if HRMS_ENABLED_COMMUNICATION_HUB
 #include "hrms_communication_hub.h"
 #endif
 
@@ -51,22 +51,22 @@
 static void vSensorHubTask(void *pvParameters);
 static void vControllerTask(void *pvParameters);
 static void vActuatorHubTask(void *pvParameters);
-#if BLFM_ENABLED_COMMUNICATION_HUB
+#if HRMS_ENABLED_COMMUNICATION_HUB
 static void vCommunicationHubTask(void *pvParameters);
 #endif
 
 // --- Event Handlers ---
 static void handle_sensor_data(void);
 
-#if BLFM_ENABLED_BIGSOUND
+#if HRMS_ENABLED_BIGSOUND
 static void handle_bigsound_event(void);
 #endif
 
-#if BLFM_ENABLED_IR_REMOTE
+#if HRMS_ENABLED_IR_REMOTE
 static void handle_ir_remote_event(void);
 #endif
 
-#if BLFM_ENABLED_MODE_BUTTON
+#if HRMS_ENABLED_MODE_BUTTON
 static void handle_mode_button_event(void);
 #endif
 
@@ -87,15 +87,15 @@ static void handle_mode_button_event(void);
 static QueueHandle_t xSensorDataQueue = NULL;
 static QueueHandle_t xActuatorCmdQueue = NULL;
 
-#if BLFM_ENABLED_BIGSOUND
+#if HRMS_ENABLED_BIGSOUND
 static QueueHandle_t xBigSoundQueue = NULL;
 #endif
 
-#if BLFM_ENABLED_IR_REMOTE
+#if HRMS_ENABLED_IR_REMOTE
 static QueueHandle_t xIRRemoteQueue = NULL;
 #endif
 
-#if BLFM_ENABLED_MODE_BUTTON
+#if HRMS_ENABLED_MODE_BUTTON
 static QueueHandle_t xModeButtonQueue = NULL;
 #endif
 
@@ -112,17 +112,17 @@ void hrms_taskmanager_setup(void) {
   configASSERT(xActuatorCmdQueue != NULL);
 
   // Optional queues
-#if BLFM_ENABLED_BIGSOUND
+#if HRMS_ENABLED_BIGSOUND
   xBigSoundQueue = xQueueCreate(5, sizeof(hrms_bigsound_event_t));
   configASSERT(xBigSoundQueue != NULL);
 #endif
 
-#if BLFM_ENABLED_IR_REMOTE
+#if HRMS_ENABLED_IR_REMOTE
   xIRRemoteQueue = xQueueCreate(5, sizeof(hrms_ir_remote_event_t));
   configASSERT(xIRRemoteQueue != NULL);
 #endif
 
-#if BLFM_ENABLED_MODE_BUTTON
+#if HRMS_ENABLED_MODE_BUTTON
   xModeButtonQueue = xQueueCreate(5, sizeof(hrms_mode_button_event_t));
   configASSERT(xModeButtonQueue != NULL);
 #endif
@@ -135,13 +135,13 @@ void hrms_taskmanager_setup(void) {
 
   xQueueAddToSet(xSensorDataQueue, xControllerQueueSet);
 
-#if BLFM_ENABLED_BIGSOUND
+#if HRMS_ENABLED_BIGSOUND
   xQueueAddToSet(xBigSoundQueue, xControllerQueueSet);
 #endif
-#if BLFM_ENABLED_IR_REMOTE
+#if HRMS_ENABLED_IR_REMOTE
   xQueueAddToSet(xIRRemoteQueue, xControllerQueueSet);
 #endif
-#if BLFM_ENABLED_MODE_BUTTON
+#if HRMS_ENABLED_MODE_BUTTON
   xQueueAddToSet(xModeButtonQueue, xControllerQueueSet);
 #endif
 // ESP32 queue set removed
@@ -151,19 +151,19 @@ void hrms_taskmanager_setup(void) {
   hrms_actuator_hub_init();
   hrms_controller_init();
 
-#if BLFM_ENABLED_COMMUNICATION_HUB
+#if HRMS_ENABLED_COMMUNICATION_HUB
   hrms_communication_hub_init();
 #endif
 
-#if BLFM_ENABLED_MODE_BUTTON
+#if HRMS_ENABLED_MODE_BUTTON
   hrms_mode_button_init(xModeButtonQueue);
 #endif
 
-#if BLFM_ENABLED_BIGSOUND
+#if HRMS_ENABLED_BIGSOUND
   hrms_bigsound_init(xBigSoundQueue);
 #endif
 
-#if BLFM_ENABLED_IR_REMOTE
+#if HRMS_ENABLED_IR_REMOTE
   hrms_ir_remote_init(xIRRemoteQueue);
 #endif
 
@@ -179,7 +179,7 @@ void hrms_taskmanager_setup(void) {
   xTaskCreate(vActuatorHubTask, "ActuatorHub", ACTUATOR_HUB_TASK_STACK, NULL,
               ACTUATOR_HUB_TASK_PRIORITY, NULL);
 
-#if BLFM_ENABLED_COMMUNICATION_HUB
+#if HRMS_ENABLED_COMMUNICATION_HUB
   xTaskCreate(vCommunicationHubTask, "CommHub", COMMUNICATION_HUB_TASK_STACK, NULL,
               COMMUNICATION_HUB_TASK_PRIORITY, NULL);
 #endif
@@ -192,7 +192,7 @@ static void vSensorHubTask(void *pvParameters) {
   (void)pvParameters;
   hrms_sensor_data_t sensor_data;
   
-#if BLFM_ENABLED_JOYSTICK
+#if HRMS_ENABLED_JOYSTICK
   static bool last_joy_button = false;
 #endif
 
@@ -201,14 +201,14 @@ static void vSensorHubTask(void *pvParameters) {
       xQueueSendToBack(xSensorDataQueue, &sensor_data, 0);
     }
     
-#if BLFM_ENABLED_JOYSTICK
+#if HRMS_ENABLED_JOYSTICK
     // Test joystick button - toggle debug LED on button press
     hrms_joystick_event_t joy_event;
     hrms_joystick_check_events(&joy_event);
     
     if (joy_event.event_occurred && joy_event.button_pressed && !last_joy_button) {
       // Button was just pressed - toggle debug LED
-      hrms_gpio_toggle_pin((uint32_t)BLFM_LED_DEBUG_PORT, BLFM_LED_DEBUG_PIN);
+      hrms_gpio_toggle_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
     }
     last_joy_button = joy_event.button_pressed;
 #endif
@@ -220,7 +220,7 @@ static void vSensorHubTask(void *pvParameters) {
 static void vControllerTask(void *pvParameters) {
   (void)pvParameters;
 
-#if BLFM_ENABLED_IR_REMOTE
+#if HRMS_ENABLED_IR_REMOTE
   hrms_actuator_command_t command;
 #endif
 
@@ -231,7 +231,7 @@ static void vControllerTask(void *pvParameters) {
         xQueueSelectFromSet(xControllerQueueSet, pdMS_TO_TICKS(100));
 
     if (activated == NULL) {
-#if BLFM_ENABLED_IR_REMOTE
+#if HRMS_ENABLED_IR_REMOTE
       if (hrms_controller_check_ir_timeout(&command)) {
         xQueueSendToBack(xActuatorCmdQueue, &command, 0);
       }
@@ -243,17 +243,17 @@ static void vControllerTask(void *pvParameters) {
     if (activated == xSensorDataQueue) {
       handle_sensor_data();
     }
-#if BLFM_ENABLED_BIGSOUND
+#if HRMS_ENABLED_BIGSOUND
     else if (activated == xBigSoundQueue) {
       handle_bigsound_event();
     }
 #endif
-#if BLFM_ENABLED_IR_REMOTE
+#if HRMS_ENABLED_IR_REMOTE
     else if (activated == xIRRemoteQueue) {
       handle_ir_remote_event();
     }
 #endif
-#if BLFM_ENABLED_MODE_BUTTON
+#if HRMS_ENABLED_MODE_BUTTON
     else if (activated == xModeButtonQueue) {
       handle_mode_button_event();
     }
@@ -287,7 +287,7 @@ static void handle_sensor_data(void) {
   }
 }
 
-#if BLFM_ENABLED_BIGSOUND
+#if HRMS_ENABLED_BIGSOUND
 static void handle_bigsound_event(void) {
   hrms_bigsound_event_t event;
   hrms_actuator_command_t command;
@@ -299,7 +299,7 @@ static void handle_bigsound_event(void) {
 }
 #endif
 
-#if BLFM_ENABLED_IR_REMOTE
+#if HRMS_ENABLED_IR_REMOTE
 static void handle_ir_remote_event(void) {
   hrms_ir_remote_event_t event;
   hrms_actuator_command_t command;
@@ -311,7 +311,7 @@ static void handle_ir_remote_event(void) {
 }
 #endif
 
-#if BLFM_ENABLED_MODE_BUTTON
+#if HRMS_ENABLED_MODE_BUTTON
 static void handle_mode_button_event(void) {
   hrms_mode_button_event_t event;
   hrms_actuator_command_t command;
@@ -323,7 +323,7 @@ static void handle_mode_button_event(void) {
 }
 #endif
 
-#if BLFM_ENABLED_COMMUNICATION_HUB
+#if HRMS_ENABLED_COMMUNICATION_HUB
 static void vCommunicationHubTask(void *pvParameters) {  
   (void)pvParameters;
   

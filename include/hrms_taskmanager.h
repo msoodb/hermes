@@ -8,11 +8,11 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_TASKMANAGER_H
-#define BLFM_TASKMANAGER_H
+#ifndef HRMS_TASKMANAGER_H
+#define HRMS_TASKMANAGER_H
 
 void hrms_taskmanager_setup(void);
 void hrms_taskmanager_start(void);
 
-#endif // BLFM_TASKMANAGER_H
+#endif // HRMS_TASKMANAGER_H
 

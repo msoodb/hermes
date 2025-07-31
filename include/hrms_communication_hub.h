@@ -7,12 +7,12 @@
  * See LICENSE file for details.
  */
 
-#ifndef BLFM_COMMUNICATION_HUB_H
-#define BLFM_COMMUNICATION_HUB_H
+#ifndef HRMS_COMMUNICATION_HUB_H
+#define HRMS_COMMUNICATION_HUB_H
 
 #include "hrms_config.h"
 
-#if BLFM_ENABLED_COMMUNICATION_HUB
+#if HRMS_ENABLED_COMMUNICATION_HUB
 
 #include "hrms_types.h"
 #include <stdbool.h>
@@ -69,6 +69,6 @@ void hrms_communication_hub_set_checksum(hrms_comm_packet_t *packet);
  */
 bool hrms_communication_hub_verify_checksum(const hrms_comm_packet_t *packet);
 
-#endif /* BLFM_ENABLED_COMMUNICATION_HUB */
+#endif /* HRMS_ENABLED_COMMUNICATION_HUB */
 
-#endif /* BLFM_COMMUNICATION_HUB_H */
+#endif /* HRMS_COMMUNICATION_HUB_H */

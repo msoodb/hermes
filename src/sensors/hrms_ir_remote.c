@@ -19,7 +19,7 @@
 // ===============================================================
 
 #include "hrms_config.h"
-#if BLFM_ENABLED_IR_REMOTE
+#if HRMS_ENABLED_IR_REMOTE
 
 #include "hrms_ir_remote.h"
 #include "FreeRTOS.h"
@@ -72,7 +72,7 @@ static uint32_t last_valid_command_tick = 0;
 // ===============================================================
 static hrms_ir_command_t ir_remote_process_pulse(uint32_t pulse_us,
                                                  bool is_low) {
-  static hrms_ir_command_t last_cmd = BLFM_IR_CMD_NONE;
+  static hrms_ir_command_t last_cmd = HRMS_IR_CMD_NONE;
 
   if (is_low) {
     // MARK
@@ -114,7 +114,7 @@ static hrms_ir_command_t ir_remote_process_pulse(uint32_t pulse_us,
         } else {
           // Too old — treat as NONE
           nec_state = NEC_STATE_IDLE;
-          return BLFM_IR_CMD_NONE;
+          return HRMS_IR_CMD_NONE;
         }
       }
 
@@ -145,9 +145,9 @@ static hrms_ir_command_t ir_remote_process_pulse(uint32_t pulse_us,
           nec_state = NEC_STATE_IDLE;
           return last_cmd;
         } else {
-          last_cmd = BLFM_IR_CMD_NONE;
+          last_cmd = HRMS_IR_CMD_NONE;
           nec_state = NEC_STATE_IDLE;
-          return BLFM_IR_CMD_NONE;
+          return HRMS_IR_CMD_NONE;
         }
       } else {
         nec_state = NEC_STATE_BIT_MARK;
@@ -159,7 +159,7 @@ static hrms_ir_command_t ir_remote_process_pulse(uint32_t pulse_us,
     }
   }
 
-  return BLFM_IR_CMD_NONE;
+  return HRMS_IR_CMD_NONE;
 }
 
 // ===============================================================
@@ -184,7 +184,7 @@ void ir_exti_handler(void) {
   bool is_mark = !is_low;
 
   hrms_ir_command_t cmd = ir_remote_process_pulse(pulse_us, is_mark);
-  if (cmd != BLFM_IR_CMD_NONE) {
+  if (cmd != HRMS_IR_CMD_NONE) {
     hrms_ir_remote_event_t event = {
         .timestamp = xTaskGetTickCountFromISR(),
         .pulse_us = pulse_us,
@@ -210,23 +210,23 @@ void hrms_ir_remote_init(QueueHandle_t controller_queue) {
   DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 
   // Configure GPIO
-  hrms_gpio_config_input_pullup((uint32_t)BLFM_IR_REMOTE_PORT,
-                                BLFM_IR_REMOTE_PIN);
+  hrms_gpio_config_input_pullup((uint32_t)HRMS_IR_REMOTE_PORT,
+                                HRMS_IR_REMOTE_PIN);
 
   // AFIO mapping for PA8
   AFIO->EXTICR[2] &= ~AFIO_EXTICR3_EXTI8;
   AFIO->EXTICR[2] |= AFIO_EXTICR3_EXTI8_PA;
 
   // Configure EXTI
-  EXTI->IMR |= (1 << BLFM_IR_REMOTE_PIN);
-  EXTI->FTSR |= (1 << BLFM_IR_REMOTE_PIN);
-  EXTI->RTSR |= (1 << BLFM_IR_REMOTE_PIN);
+  EXTI->IMR |= (1 << HRMS_IR_REMOTE_PIN);
+  EXTI->FTSR |= (1 << HRMS_IR_REMOTE_PIN);
+  EXTI->RTSR |= (1 << HRMS_IR_REMOTE_PIN);
 
   // Register callback
-  hrms_exti_register_callback(BLFM_IR_REMOTE_PIN, ir_exti_handler);
+  hrms_exti_register_callback(HRMS_IR_REMOTE_PIN, ir_exti_handler);
 
   // Enable NVIC
   NVIC_EnableIRQ(EXTI9_5_IRQn);
 }
 
-#endif /* BLFM_ENABLED_IR_REMOTE */
+#endif /* HRMS_ENABLED_IR_REMOTE */
