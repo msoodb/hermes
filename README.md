@@ -21,6 +21,7 @@ Built for the **STM32F103C8T6 (Blue Pill)**, Belfhym integrates multiple control
 - FreeRTOS Scheduling with queues, semaphores, and notifications
 - CMSIS Bare-Metal Targeting (no HAL, clean hardware control)
 - Well-Structured Codebase with modular architecture and make-based build system
+- ORION Submodule Integration for extended functionality and modularity
 ---
 
 
@@ -142,6 +143,27 @@ const portISR_t * const pxVectorTable = portSCB_VTOR_REG;
 
 ---
 
+## Project Structure
+
+```
+hermes/
+├── src/                    # Hermes source code
+│   ├── actuators/         # LED, OLED, alarm drivers
+│   ├── communications/    # nRF24L01 radio modules
+│   ├── controls/          # Joystick processing and radio transmission  
+│   ├── sensors/           # Joystick, temperature, potentiometer
+│   └── system/            # FreeRTOS task management
+├── include/               # Header files
+│   └── ORIONConfig.h     # ORION submodule configuration
+├── ORION/                 # Git submodule (external project)
+├── FreeRTOS/             # FreeRTOS kernel
+├── CMSIS/                # ARM CMSIS drivers
+├── SUBMODULES.md         # Submodule management guide
+└── Makefile              # Build system with ORION integration
+```
+
+---
+
 ## Getting Started
 
 ### Prerequisites toolchain for Development Environment (Fedora Linux)
@@ -154,16 +176,43 @@ arm-none-eabi-gcc --version
 ### 1. Clone the Repository
 
 ```bash
+# Clone with submodules
+git clone --recursive https://github.com/msoodb/hermes.git
+cd hermes
+
+# OR clone then initialize submodules
 git clone https://github.com/msoodb/hermes.git
 cd hermes
+git submodule init
+git submodule update
 ```
 
 ### 2. Build and Flash
 
 ```bash
-make
-make flash
+make                # Compile the project (includes ORION if available)
+make flash          # Flash via ST-Link  
+make help           # Show detailed build options and ORION info
 ```
+
+### 3. ORION Submodule Integration
+
+Hermes includes ORION as a git submodule for extended functionality:
+
+- **Automatic Integration**: ORION sources are automatically compiled when available in `ORION/src/`
+- **Configuration**: Use `include/ORIONConfig.h` for Hermes-specific ORION settings  
+- **Current Status**: ORION submodule is present but contains no source files yet
+- **Updates**: Only update ORION from within its own directory (`cd ORION/`), not from Hermes
+
+```bash
+# Check ORION status
+git submodule status
+
+# Update ORION to latest (when available)
+git submodule update --remote ORION
+```
+
+See `SUBMODULES.md` for detailed submodule management instructions.
 
 ### License
 This project is licensed under the GNU General Public License v3. See the LICENSE file for details.
