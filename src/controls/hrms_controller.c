@@ -133,7 +133,8 @@ void hrms_controller_send_joystick_command(const hrms_joystick_data_t *joystick_
   
   hrms_communication_hub_set_checksum(&packet);
   
-  bool transmission_success = hrms_communication_hub_send(&packet);
+  // Send the packet as raw data through the communication hub
+  bool transmission_success = hrms_communication_hub_send((uint8_t*)&packet, sizeof(packet));
   if (transmission_success) {
     last_transmission = now;
     last_sent = *joystick_data;

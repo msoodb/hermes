@@ -30,6 +30,7 @@
 
 #include "hrms_button.h"
 #include "hrms_communication_hub.h"
+#include "libc_stubs.h"
 
 // --- Task declarations ---
 static void vSensorHubTask(void *pvParameters);
@@ -65,7 +66,6 @@ void hrms_taskmanager_setup(void) {
 
   xActuatorCmdQueue = xQueueCreate(5, sizeof(hrms_actuator_command_t));
   configASSERT(xActuatorCmdQueue != NULL);
-
 
   xButtonQueue = xQueueCreate(5, sizeof(hrms_button_event_t));
   configASSERT(xButtonQueue != NULL);
@@ -172,7 +172,6 @@ static void handle_sensor_data(void) {
   }
 }
 
-
 static void handle_button_event(void) {
   hrms_button_event_t event;
   hrms_actuator_command_t command;
@@ -192,10 +191,17 @@ static void vCommunicationHubTask(void *pvParameters) {
     // Process communication hub
     hrms_communication_hub_process();
 
-    // Check for received packets
-    if (hrms_communication_hub_receive(&packet)) {
-      // Handle received packet based on type or forward to controller
-      // For now, just process it in the communication hub
+    // Check for received data
+    uint8_t rx_buffer[sizeof(hrms_comm_packet_t)];
+    size_t received_len = 0;
+    if (hrms_communication_hub_receive(rx_buffer, sizeof(rx_buffer),
+                                       &received_len)) {
+      // Received data - convert back to packet if needed
+      if (received_len == sizeof(hrms_comm_packet_t)) {
+        memcpy(&packet, rx_buffer, sizeof(packet));
+        // Handle received packet based on type or forward to controller
+        // For now, just process it in the communication hub
+      }
     }
 
     vTaskDelay(pdMS_TO_TICKS(50)); // 50ms cycle time

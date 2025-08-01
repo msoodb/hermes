@@ -148,7 +148,7 @@ hermes/
 │   ├── actuators/         # LED, OLED, alarm drivers
 │   ├── communications/    # nRF24L01 radio modules
 │   ├── controls/          # Joystick processing and radio transmission  
-│   ├── sensors/           # Joystick, temperature, potentiometer
+│   ├── sensors/           # Joystick, potentiometer
 │   └── system/            # FreeRTOS task management
 ├── include/               # Header files
 │   └── ORION_Config.h    # ORION submodule configuration

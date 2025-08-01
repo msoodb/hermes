@@ -103,9 +103,6 @@ typedef struct {
   uint16_t raw_value;  // raw ADC reading from potentiometer (0-4095)
 } hrms_potentiometer_data_t;
 
-typedef struct {
-  int32_t temperature_mc;
-} hrms_temperature_data_t;
 
 typedef struct {
   int16_t x_axis;      // -1000 to +1000 (left to right)
@@ -117,7 +114,6 @@ typedef struct {
 
 typedef struct {
   hrms_imu_data_t imu;
-  hrms_temperature_data_t temperature;
   hrms_potentiometer_data_t potentiometer;
   hrms_joystick_data_t joystick;
 } hrms_sensor_data_t;

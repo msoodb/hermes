@@ -14,6 +14,7 @@
 #include "hrms_types.h"
 #include <stdbool.h>
 #include <stdint.h>
+#include <stddef.h>
 
 /**
  * @brief Initialize the communication hub and all enabled communication modules
@@ -21,18 +22,21 @@
 void hrms_communication_hub_init(void);
 
 /**
- * @brief Send a packet through the communication hub
- * @param packet Pointer to the packet to send
- * @return true if packet was queued for transmission, false on error
+ * @brief Send raw data through the communication hub
+ * @param data Pointer to the data to send
+ * @param len Length of data in bytes
+ * @return true if data was sent successfully, false on error
  */
-bool hrms_communication_hub_send(const hrms_comm_packet_t *packet);
+bool hrms_communication_hub_send(const uint8_t *data, size_t len);
 
 /**
- * @brief Check for received packets
- * @param packet Pointer to store received packet
- * @return true if a packet was received, false if no packets available
+ * @brief Check for received data
+ * @param data Buffer to store received data
+ * @param max_len Maximum buffer size
+ * @param received_len Pointer to store actual received length
+ * @return true if data was received, false if no data available
  */
-bool hrms_communication_hub_receive(hrms_comm_packet_t *packet);
+bool hrms_communication_hub_receive(uint8_t *data, size_t max_len, size_t *received_len);
 
 /**
  * @brief Process communication hub (call periodically from task)
