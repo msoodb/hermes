@@ -110,3 +110,43 @@ void hrms_communication_hub_set_checksum(hrms_comm_packet_t *packet) {
 bool hrms_communication_hub_verify_checksum(const hrms_comm_packet_t *packet) {
   return hrms_packet_verify_checksum(packet);
 }
+
+bool hrms_communication_hub_send_joystick_data(const hrms_comm_command_t *comm_cmd) {
+  if (!comm_cmd || !comm_cmd->should_transmit) {
+    return false;
+  }
+  
+  hrms_comm_packet_t packet;
+  memset(&packet, 0, sizeof(packet));
+  
+  uint32_t now = xTaskGetTickCount();
+  packet.packet_id = (uint8_t)(now % 255) + 1;
+  packet.packet_type = comm_cmd->packet_type;
+  packet.source_id = 0x01; // Hermes controller ID
+  packet.dest_id = comm_cmd->dest_id;
+  packet.timestamp = now;
+  
+  // Prepare joystick data for encryption
+  uint8_t plaintext[sizeof(hrms_joystick_data_t)];
+  memcpy(plaintext, &comm_cmd->joystick_data, sizeof(hrms_joystick_data_t));
+  
+  // Encrypt the joystick data using ORION
+  uint8_t encrypted_data[HRMS_COMM_MAX_PAYLOAD_SIZE];
+  size_t encrypted_len = 0;
+  
+  // Always encrypt - no plaintext fallback
+  if (ORION_Encrypt(plaintext, sizeof(hrms_joystick_data_t), encrypted_data, &encrypted_len) == 0) {
+    packet.payload_size = (uint8_t)encrypted_len;
+    if (encrypted_len <= HRMS_COMM_MAX_PAYLOAD_SIZE) {
+      memcpy(packet.payload, encrypted_data, encrypted_len);
+    }
+  } else {
+    // Encryption failed - abort transmission for security
+    return false;
+  }
+  
+  hrms_communication_hub_set_checksum(&packet);
+  
+  // Send the packet as raw data through the communication hub
+  return hrms_communication_hub_send((uint8_t*)&packet, sizeof(packet));
+}

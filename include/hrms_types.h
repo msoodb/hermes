@@ -167,14 +167,22 @@ typedef struct {
                       // etc)
   uint8_t
       brightness; // brightness level (0-255), optional if hardware supports PWM
+  bool toggle_debug_led;   // Request debug LED toggle (for button feedback)
 } hrms_led_command_t;
 
-// Radio command removed - ready for new communication implementation
+// Communication command for controller to request data transmission
+typedef struct {
+  bool should_transmit;                        // Whether to send data
+  hrms_comm_packet_type_t packet_type;         // Type of data to send
+  hrms_joystick_data_t joystick_data;          // Joystick data to transmit
+  uint8_t dest_id;                             // Destination device ID
+} hrms_comm_command_t;
 
 typedef struct {
   hrms_oled_command_t oled;
   hrms_led_command_t led;
   hrms_alarm_command_t alarm;
+  hrms_comm_command_t comm;                    // Communication command
 } hrms_actuator_command_t;
 
 #endif // HRMS_TYPES_H

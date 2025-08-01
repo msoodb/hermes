@@ -56,7 +56,8 @@ static void handle_button_event(void);
 // --- Queues ---
 static QueueHandle_t xSensorDataQueue = NULL;
 static QueueHandle_t xActuatorCmdQueue = NULL;
-static QueueHandle_t xButtonQueue = NULL;
+static QueueHandle_t xButtonEventQueue = NULL;
+static QueueHandle_t xCommCmdQueue = NULL;
 static QueueSetHandle_t xControllerQueueSet = NULL;
 
 void hrms_taskmanager_setup(void) {
@@ -67,21 +68,24 @@ void hrms_taskmanager_setup(void) {
   xActuatorCmdQueue = xQueueCreate(5, sizeof(hrms_actuator_command_t));
   configASSERT(xActuatorCmdQueue != NULL);
 
-  xButtonQueue = xQueueCreate(5, sizeof(hrms_button_event_t));
-  configASSERT(xButtonQueue != NULL);
+  xButtonEventQueue = xQueueCreate(5, sizeof(hrms_button_event_t));
+  configASSERT(xButtonEventQueue != NULL);
+
+  xCommCmdQueue = xQueueCreate(5, sizeof(hrms_comm_command_t));
+  configASSERT(xCommCmdQueue != NULL);
 
   // Queue set
   xControllerQueueSet = xQueueCreateSet(10);
   configASSERT(xControllerQueueSet != NULL);
   xQueueAddToSet(xSensorDataQueue, xControllerQueueSet);
-  xQueueAddToSet(xButtonQueue, xControllerQueueSet);
+  xQueueAddToSet(xButtonEventQueue, xControllerQueueSet);
 
   // Init all modules
   hrms_sensor_hub_init();
   hrms_actuator_hub_init();
   hrms_controller_init();
   hrms_communication_hub_init();
-  hrms_button_init(xButtonQueue);
+  hrms_button_init(xButtonEventQueue);
 
   // Tasks (always run sensor and actuator hub)
   xTaskCreate(vSensorHubTask, "SensorHub", SENSOR_HUB_TASK_STACK, NULL,
@@ -104,23 +108,10 @@ static void vSensorHubTask(void *pvParameters) {
   (void)pvParameters;
   hrms_sensor_data_t sensor_data;
 
-  static bool last_joy_button = false;
-
   for (;;) {
     if (hrms_sensor_hub_read(&sensor_data)) {
       xQueueSendToBack(xSensorDataQueue, &sensor_data, 0);
     }
-
-    // Test joystick button - toggle debug LED on button press
-    hrms_joystick_event_t joy_event;
-    hrms_joystick_check_events(&joy_event);
-
-    if (joy_event.event_occurred && joy_event.button_pressed &&
-        !last_joy_button) {
-      // Button was just pressed - toggle debug LED
-      hrms_gpio_toggle_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
-    }
-    last_joy_button = joy_event.button_pressed;
 
     vTaskDelay(pdMS_TO_TICKS(200)); // Slower sensor reading for stability
   }
@@ -128,8 +119,6 @@ static void vSensorHubTask(void *pvParameters) {
 
 static void vControllerTask(void *pvParameters) {
   (void)pvParameters;
-
-  // hrms_actuator_command_t command;
 
   for (;;) {
     QueueSetMemberHandle_t activated =
@@ -141,7 +130,7 @@ static void vControllerTask(void *pvParameters) {
 
     if (activated == xSensorDataQueue) {
       handle_sensor_data();
-    } else if (activated == xButtonQueue) {
+    } else if (activated == xButtonEventQueue) {
       handle_button_event();
     }
   }
@@ -149,15 +138,55 @@ static void vControllerTask(void *pvParameters) {
 
 static void vActuatorHubTask(void *pvParameters) {
   (void)pvParameters;
-
   hrms_actuator_command_t command;
 
   for (;;) {
     if (xQueueReceive(xActuatorCmdQueue, &command, pdMS_TO_TICKS(10)) ==
         pdPASS) {
+
+      // Apply actuator commands (LED, OLED, Alarm)
       hrms_actuator_hub_apply(&command);
+      
+      // Forward communication commands to communication task queue
+      if (command.comm.should_transmit) {
+        xQueueSendToBack(xCommCmdQueue, &command.comm, 0);
+      }
     }
     vTaskDelay(pdMS_TO_TICKS(50));
+  }
+}
+
+static void vCommunicationHubTask(void *pvParameters) {
+  (void)pvParameters;
+
+  hrms_comm_packet_t packet;
+  hrms_comm_command_t comm_cmd;
+
+  for (;;) {
+    // Process communication hub (maintenance tasks)
+    hrms_communication_hub_process();
+
+    // Handle outgoing communication commands (TX)
+    if (xQueueReceive(xCommCmdQueue, &comm_cmd, 0) == pdPASS) {
+      if (comm_cmd.should_transmit) {
+        hrms_communication_hub_send_joystick_data(&comm_cmd);
+      }
+    }
+
+    // Check for incoming data (RX)
+    uint8_t rx_buffer[sizeof(hrms_comm_packet_t)];
+    size_t received_len = 0;
+    if (hrms_communication_hub_receive(rx_buffer, sizeof(rx_buffer),
+                                       &received_len)) {
+      // Received data - convert back to packet if needed
+      if (received_len == sizeof(hrms_comm_packet_t)) {
+        memcpy(&packet, rx_buffer, sizeof(packet));
+        // Handle received packet based on type or forward to controller
+        // For now, just process it in the communication hub
+      }
+    }
+
+    vTaskDelay(pdMS_TO_TICKS(50)); // 50ms cycle time
   }
 }
 
@@ -176,34 +205,8 @@ static void handle_button_event(void) {
   hrms_button_event_t event;
   hrms_actuator_command_t command;
 
-  if (xQueueReceive(xButtonQueue, &event, 0) == pdPASS) {
+  if (xQueueReceive(xButtonEventQueue, &event, 0) == pdPASS) {
     hrms_controller_process_button(&event, &command);
     xQueueSendToBack(xActuatorCmdQueue, &command, 0);
-  }
-}
-
-static void vCommunicationHubTask(void *pvParameters) {
-  (void)pvParameters;
-
-  hrms_comm_packet_t packet;
-
-  for (;;) {
-    // Process communication hub
-    hrms_communication_hub_process();
-
-    // Check for received data
-    uint8_t rx_buffer[sizeof(hrms_comm_packet_t)];
-    size_t received_len = 0;
-    if (hrms_communication_hub_receive(rx_buffer, sizeof(rx_buffer),
-                                       &received_len)) {
-      // Received data - convert back to packet if needed
-      if (received_len == sizeof(hrms_comm_packet_t)) {
-        memcpy(&packet, rx_buffer, sizeof(packet));
-        // Handle received packet based on type or forward to controller
-        // For now, just process it in the communication hub
-      }
-    }
-
-    vTaskDelay(pdMS_TO_TICKS(50)); // 50ms cycle time
   }
 }

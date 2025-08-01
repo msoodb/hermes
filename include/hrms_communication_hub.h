@@ -70,4 +70,11 @@ void hrms_communication_hub_set_checksum(hrms_comm_packet_t *packet);
  */
 bool hrms_communication_hub_verify_checksum(const hrms_comm_packet_t *packet);
 
+/**
+ * @brief Send joystick data as encrypted communication packet
+ * @param comm_cmd Communication command from controller
+ * @return true if transmission was successful, false otherwise
+ */
+bool hrms_communication_hub_send_joystick_data(const hrms_comm_command_t *comm_cmd);
+
 #endif /* HRMS_COMMUNICATION_HUB_H */

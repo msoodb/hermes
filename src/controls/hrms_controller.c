@@ -8,17 +8,14 @@
  */
 
 #include "hrms_controller.h"
-#include "ORION_Config.h"
 #include "FreeRTOS.h"
 #include "hrms_gpio.h"
 #include "hrms_pins.h"
 #include "hrms_types.h"
-#include "hrms_communication_hub.h"
 #include "task.h"
 #include "libc_stubs.h"
 #include <stdbool.h>
 #include <stdint.h>
-#include "orion.h"
 
 #define BUTTON_DEBOUNCE_MS 100
 
@@ -36,6 +33,7 @@ void hrms_controller_init(void) {
   // Set static values once during init
   default_actuator_cmd.alarm.active = false;
   default_actuator_cmd.led.mode = HRMS_LED_MODE_BLINK;
+  default_actuator_cmd.led.toggle_debug_led = false;
   
   // OLED static configuration
   default_actuator_cmd.oled.icon1 = HRMS_OLED_ICON_NONE;
@@ -48,6 +46,11 @@ void hrms_controller_init(void) {
   // Set static text strings
   safe_strncpy(default_actuator_cmd.oled.smalltext1, "JOY", HRMS_OLED_MAX_SMALL_TEXT_LEN);
   safe_strncpy(default_actuator_cmd.oled.bigtext, "HERMES 2025", HRMS_OLED_MAX_BIG_TEXT_LEN);
+  
+  // Communication command defaults
+  default_actuator_cmd.comm.should_transmit = false;
+  default_actuator_cmd.comm.packet_type = HRMS_COMM_PACKET_CONTROL_CMD;
+  default_actuator_cmd.comm.dest_id = 0x02; // Remote receiver ID
 }
 
 
@@ -65,87 +68,43 @@ void hrms_controller_process(const hrms_sensor_data_t *in,
   // Update dynamic OLED text based on joystick button state
   safe_strncpy(out->oled.smalltext2, in->joystick.button_pressed ? "BTN" : "---", HRMS_OLED_MAX_SMALL_TEXT_LEN);
 
-  // Send encrypted joystick data via radio
-  hrms_controller_send_joystick_command(&in->joystick);
+  // Controller logic: decide if joystick data should be transmitted
+  static hrms_joystick_data_t last_joystick = {0};
+  static uint32_t last_transmission_request = 0;
+  uint32_t now = xTaskGetTickCount();
+  
+  // Request transmission if joystick changed significantly or enough time passed
+  bool joystick_changed = (in->joystick.x_axis != last_joystick.x_axis || 
+                          in->joystick.y_axis != last_joystick.y_axis ||
+                          in->joystick.button_pressed != last_joystick.button_pressed);
+  
+  bool time_elapsed = (now - last_transmission_request) > pdMS_TO_TICKS(500);
+  
+  if (joystick_changed && time_elapsed) {
+    out->comm.should_transmit = true;
+    out->comm.joystick_data = in->joystick;
+    last_joystick = in->joystick;
+    last_transmission_request = now;
+  } else {
+    out->comm.should_transmit = false;
+  }
 }
 
 void hrms_controller_process_button(const hrms_button_event_t *event,
                                          hrms_actuator_command_t *command) {
   static uint32_t last_press_tick = 0;
-  (void)command;
+  
+  if (!command) return;
+  
+  // Copy default command template
+  *command = default_actuator_cmd;
 
   if (event && event->event_type == HRMS_BUTTON_EVENT_PRESSED) {
     uint32_t now = xTaskGetTickCount();
     if ((now - last_press_tick) > pdMS_TO_TICKS(BUTTON_DEBOUNCE_MS)) {
-      hrms_gpio_toggle_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+      // Controller logic: request debug LED toggle through command
+      command->led.toggle_debug_led = true;
       last_press_tick = now;
     }
-  }
-}
-
-
-void hrms_controller_send_joystick_command(const hrms_joystick_data_t *joystick_data) {
-  if (!joystick_data) return;
-  
-  static uint32_t last_transmission = 0;
-  uint32_t now = xTaskGetTickCount();
-  
-  // Limit transmission rate to prevent flooding - send every 500ms max
-  if ((now - last_transmission) < pdMS_TO_TICKS(500)) {
-    return;
-  }
-  
-  // Only send if joystick has moved significantly or button state changed
-  static hrms_joystick_data_t last_sent = {0};
-  if (joystick_data->x_axis == last_sent.x_axis && 
-      joystick_data->y_axis == last_sent.y_axis &&
-      joystick_data->button_pressed == last_sent.button_pressed) {
-    return;
-  }
-  
-  hrms_comm_packet_t packet;
-  memset(&packet, 0, sizeof(packet));
-  
-  packet.packet_id = (uint8_t)(now % 255) + 1;
-  packet.packet_type = HRMS_COMM_PACKET_CONTROL_CMD;
-  packet.source_id = 0x01; // Hermes controller ID
-  packet.dest_id = 0x02;   // Remote receiver ID
-  packet.timestamp = now;
-  
-  // Prepare joystick data for encryption
-  uint8_t plaintext[sizeof(hrms_joystick_data_t)];
-  memcpy(plaintext, joystick_data, sizeof(hrms_joystick_data_t));
-  
-  // Encrypt the joystick data using ORION
-  uint8_t encrypted_data[HRMS_COMM_MAX_PAYLOAD_SIZE];
-  size_t encrypted_len = 0;
-  
-  // Always encrypt - no plaintext fallback
-  if (ORION_Encrypt(plaintext, sizeof(hrms_joystick_data_t), encrypted_data, &encrypted_len) == 0) {
-    packet.payload_size = (uint8_t)encrypted_len;
-    if (encrypted_len <= HRMS_COMM_MAX_PAYLOAD_SIZE) {
-      memcpy(packet.payload, encrypted_data, encrypted_len);
-    }
-  } else {
-    // Encryption failed - abort transmission for security
-    return;
-  }
-  
-  hrms_communication_hub_set_checksum(&packet);
-  
-  // Send the packet as raw data through the communication hub
-  bool transmission_success = hrms_communication_hub_send((uint8_t*)&packet, sizeof(packet));
-  if (transmission_success) {
-    last_transmission = now;
-    last_sent = *joystick_data;
-    
-    // Flash debug LED on successful transmission for visual feedback
-    hrms_gpio_toggle_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
-    
-    // Also flash onboard LED to show radio activity
-    hrms_gpio_toggle_pin((uint32_t)HRMS_LED_ONBOARD_PORT, HRMS_LED_ONBOARD_PIN);
-  } else {
-    // Transmission failed - turn off onboard LED
-    hrms_gpio_clear_pin((uint32_t)HRMS_LED_ONBOARD_PORT, HRMS_LED_ONBOARD_PIN);
   }
 }

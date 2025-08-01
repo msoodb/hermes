@@ -79,6 +79,11 @@ static void vLedTask(void *pvParameters) {
     // Check for new command (non-blocking)
     if (xQueueReceive(led_command_queue, &received_cmd, 0) == pdPASS) {
       current_cmd = received_cmd;
+      
+      // Handle debug LED toggle request
+      if (received_cmd.toggle_debug_led) {
+        hrms_gpio_toggle_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+      }
     }
 
     switch (current_cmd.mode) {
