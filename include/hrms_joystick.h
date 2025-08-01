@@ -20,7 +20,7 @@ typedef struct {
 } hrms_joystick_event_t;
 
 void hrms_joystick_init(void);
-void hrms_joystick_read(hrms_joystick_data_t *data);
+bool hrms_joystick_read(hrms_joystick_data_t *data);
 void hrms_joystick_check_events(hrms_joystick_event_t *event);
 
 #endif /* HRMS_JOYSTICK_H */

@@ -33,8 +33,8 @@ void hrms_joystick_init(void) {
   hrms_gpio_config_input_pullup((uint32_t)HRMS_JOYSTICK_SW_PORT, HRMS_JOYSTICK_SW_PIN);
 }
 
-void hrms_joystick_read(hrms_joystick_data_t *data) {
-  if (!data) return;
+bool hrms_joystick_read(hrms_joystick_data_t *data) {
+  if (!data) return false;
   
   // Read ADC values
   uint16_t vrx_raw, vry_raw;
@@ -80,13 +80,20 @@ void hrms_joystick_read(hrms_joystick_data_t *data) {
   
   // Read button state (active low - pressed = 0)
   data->button_pressed = !hrms_gpio_read_pin((uint32_t)HRMS_JOYSTICK_SW_PORT, HRMS_JOYSTICK_SW_PIN);
+  
+  return true;
 }
 
 void hrms_joystick_check_events(hrms_joystick_event_t *event) {
   if (!event) return;
   
   hrms_joystick_data_t data;
-  hrms_joystick_read(&data);
+  if (!hrms_joystick_read(&data)) {
+    // If read fails, no event occurred
+    event->event_occurred = false;
+    event->button_pressed = false;
+    return;
+  }
   
   // Check for button press event (rising edge)
   bool current_button = data.button_pressed;
