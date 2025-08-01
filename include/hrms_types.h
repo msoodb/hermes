@@ -81,14 +81,14 @@ typedef struct {
 
 // Event definitions
 typedef enum {
-  HRMS_MODE_BUTTON_EVENT_PRESSED,
-  HRMS_MODE_BUTTON_EVENT_RELEASED
-} hrms_mode_button_event_type_t;
+  HRMS_BUTTON_EVENT_PRESSED,
+  HRMS_BUTTON_EVENT_RELEASED
+} hrms_button_event_type_t;
 
 typedef struct {
-  hrms_mode_button_event_type_t event_type;
+  hrms_button_event_type_t event_type;
   uint32_t timestamp;
-} hrms_mode_button_event_t;
+} hrms_button_event_t;
 
 typedef struct {
   int16_t acc_x;

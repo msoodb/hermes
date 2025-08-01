@@ -28,7 +28,7 @@
 #include "hrms_controller.h"
 #include "hrms_sensor_hub.h"
 
-#include "hrms_mode_button.h"
+#include "hrms_button.h"
 #include "hrms_communication_hub.h"
 
 // --- Task declarations ---
@@ -39,9 +39,7 @@ static void vCommunicationHubTask(void *pvParameters);
 
 // --- Event Handlers ---
 static void handle_sensor_data(void);
-static void handle_mode_button_event(void);
-
-// ESP32 handlers removed
+static void handle_button_event(void);
 
 // --- Task and queue settings ---
 #define SENSOR_HUB_TASK_STACK 256
@@ -57,7 +55,7 @@ static void handle_mode_button_event(void);
 // --- Queues ---
 static QueueHandle_t xSensorDataQueue = NULL;
 static QueueHandle_t xActuatorCmdQueue = NULL;
-static QueueHandle_t xModeButtonQueue = NULL;
+static QueueHandle_t xButtonQueue = NULL;
 static QueueSetHandle_t xControllerQueueSet = NULL;
 
 void hrms_taskmanager_setup(void) {
@@ -69,21 +67,21 @@ void hrms_taskmanager_setup(void) {
   configASSERT(xActuatorCmdQueue != NULL);
 
 
-  xModeButtonQueue = xQueueCreate(5, sizeof(hrms_mode_button_event_t));
-  configASSERT(xModeButtonQueue != NULL);
+  xButtonQueue = xQueueCreate(5, sizeof(hrms_button_event_t));
+  configASSERT(xButtonQueue != NULL);
 
   // Queue set
   xControllerQueueSet = xQueueCreateSet(10);
   configASSERT(xControllerQueueSet != NULL);
   xQueueAddToSet(xSensorDataQueue, xControllerQueueSet);
-  xQueueAddToSet(xModeButtonQueue, xControllerQueueSet);
+  xQueueAddToSet(xButtonQueue, xControllerQueueSet);
 
   // Init all modules
   hrms_sensor_hub_init();
   hrms_actuator_hub_init();
   hrms_controller_init();
   hrms_communication_hub_init();
-  hrms_mode_button_init(xModeButtonQueue);
+  hrms_button_init(xButtonQueue);
 
   // Tasks (always run sensor and actuator hub)
   xTaskCreate(vSensorHubTask, "SensorHub", SENSOR_HUB_TASK_STACK, NULL,
@@ -143,8 +141,8 @@ static void vControllerTask(void *pvParameters) {
 
     if (activated == xSensorDataQueue) {
       handle_sensor_data();
-    } else if (activated == xModeButtonQueue) {
-      handle_mode_button_event();
+    } else if (activated == xButtonQueue) {
+      handle_button_event();
     }
   }
 }
@@ -175,12 +173,12 @@ static void handle_sensor_data(void) {
 }
 
 
-static void handle_mode_button_event(void) {
-  hrms_mode_button_event_t event;
+static void handle_button_event(void) {
+  hrms_button_event_t event;
   hrms_actuator_command_t command;
 
-  if (xQueueReceive(xModeButtonQueue, &event, 0) == pdPASS) {
-    hrms_controller_process_mode_button(&event, &command);
+  if (xQueueReceive(xButtonQueue, &event, 0) == pdPASS) {
+    hrms_controller_process_button(&event, &command);
     xQueueSendToBack(xActuatorCmdQueue, &command, 0);
   }
 }

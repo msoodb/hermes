@@ -18,6 +18,6 @@
 #include "hrms_types.h"
 #include "hrms_pins.h"
 
-void hrms_mode_button_init(QueueHandle_t controller_queue);
+void hrms_button_init(QueueHandle_t controller_queue);
 
 #endif // HRMS_MODE_BUTTON_H

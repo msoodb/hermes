@@ -20,7 +20,7 @@
 #include <stdint.h>
 #include "orion.h"
 
-#define MODE_BUTTON_DEBOUNCE_MS 100
+#define BUTTON_DEBOUNCE_MS 100
 
 char num_buf[12];
 
@@ -69,14 +69,14 @@ void hrms_controller_process(const hrms_sensor_data_t *in,
   hrms_controller_send_joystick_command(&in->joystick);
 }
 
-void hrms_controller_process_mode_button(const hrms_mode_button_event_t *event,
+void hrms_controller_process_button(const hrms_button_event_t *event,
                                          hrms_actuator_command_t *command) {
   static uint32_t last_press_tick = 0;
   (void)command;
 
-  if (event && event->event_type == HRMS_MODE_BUTTON_EVENT_PRESSED) {
+  if (event && event->event_type == HRMS_BUTTON_EVENT_PRESSED) {
     uint32_t now = xTaskGetTickCount();
-    if ((now - last_press_tick) > pdMS_TO_TICKS(MODE_BUTTON_DEBOUNCE_MS)) {
+    if ((now - last_press_tick) > pdMS_TO_TICKS(BUTTON_DEBOUNCE_MS)) {
       hrms_gpio_toggle_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
       last_press_tick = now;
     }

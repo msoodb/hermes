@@ -47,7 +47,7 @@ void hrms_controller_send_joystick_command(const hrms_joystick_data_t *joystick_
  * Handle mode button events with debounce.
  * Typically cycles modes and can trigger servo motions.
  */
-void hrms_controller_process_mode_button(const hrms_mode_button_event_t *event,
+void hrms_controller_process_button(const hrms_button_event_t *event,
                                          hrms_actuator_command_t *command);
 
 
