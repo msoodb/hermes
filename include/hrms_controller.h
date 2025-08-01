@@ -58,12 +58,6 @@ void hrms_controller_process_mode_button(const hrms_mode_button_event_t *event,
 
 // ESP32 communication removed - ready for new implementation
 
-/**
- * Handle Big Sound events.
- * Triggers display or alarm patterns when noise is detected.
- */
-void hrms_controller_process_bigsound(const hrms_bigsound_event_t *event,
-                                      hrms_actuator_command_t *out);
 
 
 #endif /* HRMS_CONTROLLER_H */

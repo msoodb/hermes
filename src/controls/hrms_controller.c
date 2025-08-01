@@ -146,12 +146,6 @@ void hrms_controller_process_mode_button(const hrms_mode_button_event_t *event,
   }
 }
 
-void hrms_controller_process_bigsound(const hrms_bigsound_event_t *event,
-                                      hrms_actuator_command_t *out) {
-  if (!event || !out)
-    return;
-  // You can implement this or leave empty
-}
 
 void hrms_controller_send_joystick_command(const hrms_joystick_data_t *joystick_data) {
   if (!joystick_data) return;

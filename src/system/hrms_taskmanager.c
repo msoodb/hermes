@@ -16,8 +16,8 @@
  */
 
 #include "hrms_taskmanager.h"
-#include "hrms_joystick.h"
 #include "hrms_gpio.h"
+#include "hrms_joystick.h"
 #include "hrms_pins.h"
 
 #include "FreeRTOS.h"
@@ -29,10 +29,6 @@
 #include "hrms_sensor_hub.h"
 
 #include "hrms_mode_button.h"
-
-
-#include "hrms_bigsound.h"
-
 #include "hrms_communication_hub.h"
 
 // --- Task declarations ---
@@ -43,10 +39,6 @@ static void vCommunicationHubTask(void *pvParameters);
 
 // --- Event Handlers ---
 static void handle_sensor_data(void);
-
-static void handle_bigsound_event(void);
-
-
 static void handle_mode_button_event(void);
 
 // ESP32 handlers removed
@@ -65,57 +57,33 @@ static void handle_mode_button_event(void);
 // --- Queues ---
 static QueueHandle_t xSensorDataQueue = NULL;
 static QueueHandle_t xActuatorCmdQueue = NULL;
-
-static QueueHandle_t xBigSoundQueue = NULL;
-
-
 static QueueHandle_t xModeButtonQueue = NULL;
-
-// ESP32 queue removed
-
 static QueueSetHandle_t xControllerQueueSet = NULL;
 
 void hrms_taskmanager_setup(void) {
-  // Always create sensor + actuator command queues
+
   xSensorDataQueue = xQueueCreate(5, sizeof(hrms_sensor_data_t));
   configASSERT(xSensorDataQueue != NULL);
 
   xActuatorCmdQueue = xQueueCreate(5, sizeof(hrms_actuator_command_t));
   configASSERT(xActuatorCmdQueue != NULL);
 
-  // Optional queues
-  xBigSoundQueue = xQueueCreate(5, sizeof(hrms_bigsound_event_t));
-  configASSERT(xBigSoundQueue != NULL);
-
 
   xModeButtonQueue = xQueueCreate(5, sizeof(hrms_mode_button_event_t));
   configASSERT(xModeButtonQueue != NULL);
 
-// ESP32 queue creation removed
-
   // Queue set
   xControllerQueueSet = xQueueCreateSet(10);
   configASSERT(xControllerQueueSet != NULL);
-
   xQueueAddToSet(xSensorDataQueue, xControllerQueueSet);
-
-  xQueueAddToSet(xBigSoundQueue, xControllerQueueSet);
   xQueueAddToSet(xModeButtonQueue, xControllerQueueSet);
-// ESP32 queue set removed
 
   // Init all modules
   hrms_sensor_hub_init();
   hrms_actuator_hub_init();
   hrms_controller_init();
-
   hrms_communication_hub_init();
-
   hrms_mode_button_init(xModeButtonQueue);
-
-  hrms_bigsound_init(xBigSoundQueue);
-
-
-// ESP32 init removed
 
   // Tasks (always run sensor and actuator hub)
   xTaskCreate(vSensorHubTask, "SensorHub", SENSOR_HUB_TASK_STACK, NULL,
@@ -127,8 +95,8 @@ void hrms_taskmanager_setup(void) {
   xTaskCreate(vActuatorHubTask, "ActuatorHub", ACTUATOR_HUB_TASK_STACK, NULL,
               ACTUATOR_HUB_TASK_PRIORITY, NULL);
 
-  xTaskCreate(vCommunicationHubTask, "CommHub", COMMUNICATION_HUB_TASK_STACK, NULL,
-              COMMUNICATION_HUB_TASK_PRIORITY, NULL);
+  xTaskCreate(vCommunicationHubTask, "CommHub", COMMUNICATION_HUB_TASK_STACK,
+              NULL, COMMUNICATION_HUB_TASK_PRIORITY, NULL);
 }
 
 void hrms_taskmanager_start(void) { vTaskStartScheduler(); }
@@ -137,32 +105,33 @@ void hrms_taskmanager_start(void) { vTaskStartScheduler(); }
 static void vSensorHubTask(void *pvParameters) {
   (void)pvParameters;
   hrms_sensor_data_t sensor_data;
-  
+
   static bool last_joy_button = false;
 
   for (;;) {
     if (hrms_sensor_hub_read(&sensor_data)) {
       xQueueSendToBack(xSensorDataQueue, &sensor_data, 0);
     }
-    
+
     // Test joystick button - toggle debug LED on button press
     hrms_joystick_event_t joy_event;
     hrms_joystick_check_events(&joy_event);
-    
-    if (joy_event.event_occurred && joy_event.button_pressed && !last_joy_button) {
+
+    if (joy_event.event_occurred && joy_event.button_pressed &&
+        !last_joy_button) {
       // Button was just pressed - toggle debug LED
       hrms_gpio_toggle_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
     }
     last_joy_button = joy_event.button_pressed;
-    
-    vTaskDelay(pdMS_TO_TICKS(200));  // Slower sensor reading for stability
+
+    vTaskDelay(pdMS_TO_TICKS(200)); // Slower sensor reading for stability
   }
 }
 
 static void vControllerTask(void *pvParameters) {
   (void)pvParameters;
 
-  //hrms_actuator_command_t command;
+  // hrms_actuator_command_t command;
 
   for (;;) {
     QueueSetMemberHandle_t activated =
@@ -174,11 +143,7 @@ static void vControllerTask(void *pvParameters) {
 
     if (activated == xSensorDataQueue) {
       handle_sensor_data();
-    }
-    else if (activated == xBigSoundQueue) {
-      handle_bigsound_event();
-    }
-    else if (activated == xModeButtonQueue) {
+    } else if (activated == xModeButtonQueue) {
       handle_mode_button_event();
     }
   }
@@ -209,16 +174,6 @@ static void handle_sensor_data(void) {
   }
 }
 
-static void handle_bigsound_event(void) {
-  hrms_bigsound_event_t event;
-  hrms_actuator_command_t command;
-
-  if (xQueueReceive(xBigSoundQueue, &event, 0) == pdPASS) {
-    hrms_controller_process_bigsound(&event, &command);
-    xQueueSendToBack(xActuatorCmdQueue, &command, 0);
-  }
-}
-
 
 static void handle_mode_button_event(void) {
   hrms_mode_button_event_t event;
@@ -230,21 +185,21 @@ static void handle_mode_button_event(void) {
   }
 }
 
-static void vCommunicationHubTask(void *pvParameters) {  
+static void vCommunicationHubTask(void *pvParameters) {
   (void)pvParameters;
-  
+
   hrms_comm_packet_t packet;
 
   for (;;) {
     // Process communication hub
     hrms_communication_hub_process();
-    
+
     // Check for received packets
     if (hrms_communication_hub_receive(&packet)) {
       // Handle received packet based on type or forward to controller
       // For now, just process it in the communication hub
     }
-    
+
     vTaskDelay(pdMS_TO_TICKS(50)); // 50ms cycle time
   }
 }
