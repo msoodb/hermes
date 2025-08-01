@@ -154,7 +154,7 @@ hermes/
 │   ├── sensors/           # Joystick, temperature, potentiometer
 │   └── system/            # FreeRTOS task management
 ├── include/               # Header files
-│   └── ORIONConfig.h     # ORION submodule configuration
+│   └── ORION_Config.h    # ORION submodule configuration
 ├── ORION/                 # Git submodule (external project)
 ├── FreeRTOS/             # FreeRTOS kernel
 ├── CMSIS/                # ARM CMSIS drivers
@@ -200,7 +200,7 @@ make help           # Show detailed build options and ORION info
 Hermes includes ORION as a git submodule for extended functionality:
 
 - **Automatic Integration**: ORION sources are automatically compiled when available in `ORION/src/`
-- **Configuration**: Use `include/ORIONConfig.h` for Hermes-specific ORION settings  
+- **Configuration**: Use `include/ORION_Config.h` for Hermes-specific ORION settings  
 - **Current Status**: ORION submodule is present but contains no source files yet
 - **Updates**: Only update ORION from within its own directory (`cd ORION/`), not from Hermes
 

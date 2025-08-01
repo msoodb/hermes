@@ -162,16 +162,13 @@ static void vSensorHubTask(void *pvParameters) {
 static void vControllerTask(void *pvParameters) {
   (void)pvParameters;
 
-  hrms_actuator_command_t command;
-
-// ESP32 event variables removed
+  //hrms_actuator_command_t command;
 
   for (;;) {
     QueueSetMemberHandle_t activated =
         xQueueSelectFromSet(xControllerQueueSet, pdMS_TO_TICKS(100));
 
     if (activated == NULL) {
-// ESP32 event polling removed
       continue;
     }
 
@@ -184,7 +181,6 @@ static void vControllerTask(void *pvParameters) {
     else if (activated == xModeButtonQueue) {
       handle_mode_button_event();
     }
-// ESP32 event handling removed
   }
 }
 

@@ -11,6 +11,7 @@ BIN_DIR       := bin
 INCLUDE_DIR   := include
 FREERTOS_DIR  := FreeRTOS
 CMSIS_DIR     := CMSIS
+ORION_DIR     := ORION
 LD_SCRIPT     := ld/stm32f103.ld
 
 # Toolchain
@@ -23,6 +24,11 @@ OPTIMIZATION ?= -O2
 CFLAGS := -Wall -Wextra $(OPTIMIZATION) -mcpu=cortex-m3 -mthumb -nostdlib -ffreestanding
 CFLAGS += -DSTM32F103xB -I$(INCLUDE_DIR) -I$(CMSIS_DIR)
 CFLAGS += -I$(FREERTOS_DIR)/include -I$(FREERTOS_DIR)/portable/GCC/ARM_CM3
+
+# Conditionally add ORION include paths if ORION has source files
+ifneq ($(wildcard $(ORION_DIR)/include),)
+CFLAGS += -I$(ORION_DIR)/include
+endif
 LDFLAGS := -T$(LD_SCRIPT) -nostdlib -ffreestanding -mcpu=cortex-m3 -mthumb
 
 # Sources
@@ -45,7 +51,13 @@ CMSIS_SRCS := \
     $(CMSIS_DIR)/startup_stm32f103xb.s \
     $(CMSIS_DIR)/system_stm32f1xx.c
 
-SRCS := $(USER_SRCS) $(FREERTOS_SRCS) $(CMSIS_SRCS)
+# Conditionally include ORION sources if they exist
+ORION_SRCS :=
+ifneq ($(wildcard $(ORION_DIR)/src),)
+ORION_SRCS := $(wildcard $(ORION_DIR)/src/*.c)
+endif
+
+SRCS := $(USER_SRCS) $(FREERTOS_SRCS) $(CMSIS_SRCS) $(ORION_SRCS)
 
 # Object files
 OBJS := $(patsubst %.c,$(BUILD_DIR)/%.o,$(filter %.c,$(SRCS)))

@@ -40,6 +40,12 @@ void hrms_controller_cycle_mode(hrms_actuator_command_t *out);
 void hrms_controller_process(const hrms_sensor_data_t *in,
                              hrms_actuator_command_t *out);
 
+/**
+ * Send encrypted joystick commands via radio communication.
+ * Uses ORION encryption when available, falls back to plaintext.
+ */
+void hrms_controller_send_joystick_command(const hrms_joystick_data_t *joystick_data);
+
 
 
 /**

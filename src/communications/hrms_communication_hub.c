@@ -10,11 +10,16 @@
 
 #include "hrms_communication_hub.h"
 #include "hrms_types.h"
+#include "ORION_Config.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "libc_stubs.h"
 
 #include "hrms_nrf24l01.h"
+
+#if ORION_INTEGRATION_ENABLED
+#include "orion.h"
+#endif
 
 // Communication hub state
 static hrms_comm_stats_t comm_stats = {0};
@@ -23,6 +28,11 @@ static uint8_t next_packet_id = 1;
 void hrms_communication_hub_init(void) {
   // Initialize statistics
   memset(&comm_stats, 0, sizeof(comm_stats));
+  
+#if ORION_INTEGRATION_ENABLED
+  // Initialize ORION encryption system
+  ORION_Init();
+#endif
   
   // Initialize enabled communication modules
   if (hrms_nrf24l01_init()) {
