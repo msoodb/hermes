@@ -27,15 +27,10 @@
  */
 void hrms_controller_init(void);
 
-/**
- * Cycle between MANUAL/AUTO/EMERGENCY modes.
- * Updates the LED and stops motors.
- */
-void hrms_controller_cycle_mode(hrms_actuator_command_t *out);
 
 /**
- * Process sensor data and update actuator commands.
- * Typically called periodically in AUTO mode.
+ * Process joystick sensor data and update actuator commands.
+ * Handles joystick input processing and radio transmission.
  */
 void hrms_controller_process(const hrms_sensor_data_t *in,
                              hrms_actuator_command_t *out);

@@ -12,124 +12,61 @@
 #include "FreeRTOS.h"
 #include "hrms_gpio.h"
 #include "hrms_pins.h"
-#include "hrms_state.h"
 #include "hrms_types.h"
 #include "hrms_communication_hub.h"
 #include "task.h"
 #include "libc_stubs.h"
 #include <stdbool.h>
 #include <stdint.h>
-
-#if ORION_INTEGRATION_ENABLED
 #include "orion.h"
-#endif
 
 #define MODE_BUTTON_DEBOUNCE_MS 100
 
 char num_buf[12];
 
-static hrms_system_state_t hrms_system_state = {
-    .current_mode = HRMS_MODE_MANUAL, .motion_state = HRMS_MOTION_STOP};
-
-/* -------------------- Utilities -------------------- */
-
-/*static int pseudo_random(int min, int max) {
-  static uint32_t seed = 123456789;
-  seed = seed * 1664525 + 1013904223;
-  return min + (seed % (max - min + 1));
-}
-
-static void uint_to_str(char *buf, uint16_t value) {
-  if (value >= 100) {
-    buf[0] = '0' + (value / 100) % 10;
-    buf[1] = '0' + (value / 10) % 10;
-    buf[2] = '0' + value % 10;
-    buf[3] = '\0';
-  } else if (value >= 10) {
-    buf[0] = '0' + (value / 10) % 10;
-    buf[1] = '0' + value % 10;
-    buf[2] = '\0';
-  } else {
-    buf[0] = '0' + value;
-    buf[1] = '\0';
-  }
-  }*/
+// Pre-initialized actuator command template for performance
+static hrms_actuator_command_t default_actuator_cmd;
 
 /* -------------------- Public Controller -------------------- */
 
 void hrms_controller_init(void) {
-  // Reserved for future initialization
+  // Initialize default actuator command template for performance
+  memset(&default_actuator_cmd, 0, sizeof(default_actuator_cmd));
+  
+  // Set static values once during init
+  default_actuator_cmd.alarm.active = false;
+  default_actuator_cmd.led.mode = HRMS_LED_MODE_BLINK;
+  
+  // OLED static configuration
+  default_actuator_cmd.oled.icon1 = HRMS_OLED_ICON_NONE;
+  default_actuator_cmd.oled.icon2 = HRMS_OLED_ICON_NONE;
+  default_actuator_cmd.oled.icon3 = HRMS_OLED_ICON_SMILEY;
+  default_actuator_cmd.oled.icon4 = HRMS_OLED_ICON_NONE;
+  default_actuator_cmd.oled.invert = 0;
+  default_actuator_cmd.oled.progress_percent = 100;
+  
+  // Set static text strings
+  safe_strncpy(default_actuator_cmd.oled.smalltext1, "JOY", HRMS_OLED_MAX_SMALL_TEXT_LEN);
+  safe_strncpy(default_actuator_cmd.oled.bigtext, "HERMES 2025", HRMS_OLED_MAX_BIG_TEXT_LEN);
 }
 
-// --- Mode-setting functions ---
-static void hrms_set_mode_auto(hrms_actuator_command_t *out) {
-  hrms_system_state.current_mode = HRMS_MODE_AUTO;
-  out->led.mode = HRMS_LED_MODE_BLINK;
-  out->led.blink_speed_ms = 250;
-}
-
-static void hrms_set_mode_manual(hrms_actuator_command_t *out) {
-  hrms_system_state.current_mode = HRMS_MODE_MANUAL;
-  out->led.mode = HRMS_LED_MODE_OFF;
-}
-
-static void hrms_set_mode_emergency(hrms_actuator_command_t *out) {
-  hrms_system_state.current_mode = HRMS_MODE_EMERGENCY;
-  out->led.mode = HRMS_LED_MODE_ON;
-}
-
-// --- Public interface to change mode ---
-void hrms_controller_change_mode(hrms_mode_t mode,
-                                 hrms_actuator_command_t *out) {
-  switch (mode) {
-  case HRMS_MODE_AUTO:
-    hrms_set_mode_auto(out);
-    break;
-  case HRMS_MODE_MANUAL:
-    hrms_set_mode_manual(out);
-    break;
-  case HRMS_MODE_EMERGENCY:
-  default:
-    hrms_set_mode_emergency(out);
-    break;
-  }
-
-  hrms_system_state.motion_state = HRMS_MOTION_STOP;
-}
 
 void hrms_controller_process(const hrms_sensor_data_t *in,
                              hrms_actuator_command_t *out) {
   if (!in || !out)
     return;
 
-  uint16_t led_blink_speed = 100;
-  hrms_led_mode_t led_mode = HRMS_LED_MODE_BLINK;
+  // Copy pre-initialized template for performance (bulk copy of static values)
+  *out = default_actuator_cmd;
 
-  // Ultrasonic removed - disable distance-based alarm
-  out->alarm.active = false;
-
-  uint16_t pot_val = in->potentiometer.raw_value;
-
-  led_mode = HRMS_LED_MODE_BLINK;
-  led_blink_speed = pot_val; // + (pot_val * (1500 - 200)) / 4095;
-
-  out->led.mode = led_mode;
-  out->led.blink_speed_ms = led_blink_speed;
+  // Only update dynamic values
+  out->led.blink_speed_ms = in->potentiometer.raw_value;
+  
+  // Update dynamic OLED text based on joystick button state
+  safe_strncpy(out->oled.smalltext2, in->joystick.button_pressed ? "BTN" : "---", HRMS_OLED_MAX_SMALL_TEXT_LEN);
 
   // Send encrypted joystick data via radio
   hrms_controller_send_joystick_command(&in->joystick);
-
-  out->oled.icon1 = HRMS_OLED_ICON_NONE;
-  out->oled.icon2 = HRMS_OLED_ICON_NONE;
-  out->oled.icon3 = HRMS_OLED_ICON_SMILEY;
-  out->oled.icon4 = HRMS_OLED_ICON_NONE;
-
-  safe_strncpy(out->oled.smalltext1, "JOY", HRMS_OLED_MAX_SMALL_TEXT_LEN);
-  safe_strncpy(out->oled.bigtext, "HERMES 2025", HRMS_OLED_MAX_BIG_TEXT_LEN);
-  safe_strncpy(out->oled.smalltext2, in->joystick.button_pressed ? "BTN" : "---", HRMS_OLED_MAX_SMALL_TEXT_LEN);
-
-  out->oled.invert = 0;
-  out->oled.progress_percent = 100;
 }
 
 void hrms_controller_process_mode_button(const hrms_mode_button_event_t *event,
@@ -179,27 +116,20 @@ void hrms_controller_send_joystick_command(const hrms_joystick_data_t *joystick_
   uint8_t plaintext[sizeof(hrms_joystick_data_t)];
   memcpy(plaintext, joystick_data, sizeof(hrms_joystick_data_t));
   
-#if ORION_INTEGRATION_ENABLED
   // Encrypt the joystick data using ORION
   uint8_t encrypted_data[HRMS_COMM_MAX_PAYLOAD_SIZE];
   size_t encrypted_len = 0;
   
+  // Always encrypt - no plaintext fallback
   if (ORION_Encrypt(plaintext, sizeof(hrms_joystick_data_t), encrypted_data, &encrypted_len) == 0) {
-    // Successfully encrypted - use encrypted data
     packet.payload_size = (uint8_t)encrypted_len;
     if (encrypted_len <= HRMS_COMM_MAX_PAYLOAD_SIZE) {
       memcpy(packet.payload, encrypted_data, encrypted_len);
     }
   } else {
-    // Encryption failed - fall back to plaintext (for debugging)
-    packet.payload_size = sizeof(hrms_joystick_data_t);
-    memcpy(packet.payload, plaintext, sizeof(hrms_joystick_data_t));
+    // Encryption failed - abort transmission for security
+    return;
   }
-#else
-  // No encryption - send plaintext
-  packet.payload_size = sizeof(hrms_joystick_data_t);
-  memcpy(packet.payload, plaintext, sizeof(hrms_joystick_data_t));
-#endif
   
   hrms_communication_hub_set_checksum(&packet);
   
@@ -218,5 +148,3 @@ void hrms_controller_send_joystick_command(const hrms_joystick_data_t *joystick_
     hrms_gpio_clear_pin((uint32_t)HRMS_LED_ONBOARD_PORT, HRMS_LED_ONBOARD_PIN);
   }
 }
-
-// ESP32 communication module removed - ready for new implementation
