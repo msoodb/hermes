@@ -1,27 +1,27 @@
-# Belfhym: FreeRTOS-Based Lunar Rover Robot
+# Hermes: Joystick Radio Controller
 
-**Belfhym** is a modular, real-time lunar rover robot powered by **FreeRTOS** and **CMSIS**, designed for:
+**Hermes** is a wireless joystick controller system built on **FreeRTOS** and **CMSIS**, designed for:
 
-- Autonomous terrain navigation
-- Multi-sensor fusion
-- Real-time telemetry
-- Manual override via remote command
+- Real-time joystick input capture
+- nRF24L01 wireless radio transmission
+- Visual feedback via OLED display
+- Remote control applications
   
-Built for the **STM32F103C8T6 (Blue Pill)**, Belfhym integrates multiple control and sensing subsystems into a clean, multitasking environment with well-defined inter-task communication and scheduling policies.
+Built for the **STM32F103C8T6 (Blue Pill)**, Hermes provides reliable wireless joystick control with integrated feedback systems and modular communication architecture.
 
 ---
 
 ## Project Highlights
 
-- 6-Wheel Motor Control with PID regulation
-- Multi-Sensor Fusion: Ultrasonic, IMU, thermal, power, radio, etc.
-- Failsafe and Safety System
-- Real-Time Telemetry over UART/radio
-- Manual Control Mode
-- FreeRTOS Scheduling with queues, semaphores, and notifications
-- CMSIS Bare-Metal Targeting (no HAL, clean hardware control)
-- Well-Structured Codebase with modular architecture and make-based build system
-- ORION Submodule Integration for extended functionality and modularity
+- **Joystick Input**: Analog X/Y axes (-1000 to +1000 range) with button support
+- **nRF24L01 Radio**: 2.4GHz wireless transmission with automatic acknowledgment
+- **Real-time Processing**: FreeRTOS task scheduling with rate limiting (2Hz transmission)
+- **Visual Feedback**: OLED display showing joystick status and connection state
+- **LED Indicators**: Debug LEDs for transmission status and hardware testing
+- **Modular Architecture**: Hub-based design with sensor, controller, and actuator layers
+- **CMSIS Bare-Metal**: No HAL dependencies, direct hardware control
+- **Communication Protocol**: Packet-based with checksums and error detection
+- **ORION Submodule Integration**: Extended functionality and modularity support
 ---
 
 
