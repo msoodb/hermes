@@ -108,8 +108,12 @@ void hrms_controller_process_button(const hrms_button_event_t *event,
   if (event && event->event_type == HRMS_BUTTON_EVENT_PRESSED) {
     uint32_t now = xTaskGetTickCount();
     if ((now - last_press_tick) > pdMS_TO_TICKS(BUTTON_DEBOUNCE_MS)) {
-      // Controller logic: request debug LED toggle through command
+      // Immediate LED feedback for real-time response (controller logic)
+      hrms_gpio_toggle_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+      
+      // Set LED command for other potential feedback
       command->led.toggle_debug_led = true;
+      
       last_press_tick = now;
     }
   }

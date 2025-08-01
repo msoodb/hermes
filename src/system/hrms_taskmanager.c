@@ -118,7 +118,7 @@ static void vControllerTask(void *pvParameters) {
 
   for (;;) {
     QueueSetMemberHandle_t activated =
-        xQueueSelectFromSet(xControllerQueueSet, pdMS_TO_TICKS(100));
+        xQueueSelectFromSet(xControllerQueueSet, portMAX_DELAY);
 
     if (activated == NULL) {
       continue;
