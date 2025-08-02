@@ -39,15 +39,15 @@ static void handle_sensor_data(void);
 static void handle_button_event(void);
 
 // --- Task and queue settings ---
-#define SENSOR_HUB_TASK_STACK 256
-#define CONTROLLER_TASK_STACK 256
-#define ACTUATOR_HUB_TASK_STACK 256
-#define COMMUNICATION_HUB_TASK_STACK 256
+#define SENSOR_HUB_TASK_STACK 384
+#define CONTROLLER_TASK_STACK 512
+#define ACTUATOR_HUB_TASK_STACK 384
+#define COMMUNICATION_HUB_TASK_STACK 512
 
-#define SENSOR_HUB_TASK_PRIORITY 2
-#define CONTROLLER_TASK_PRIORITY 2
-#define ACTUATOR_HUB_TASK_PRIORITY 2
-#define COMMUNICATION_HUB_TASK_PRIORITY 1
+#define SENSOR_HUB_TASK_PRIORITY 4     // Highest - real-time data collection
+#define CONTROLLER_TASK_PRIORITY 3     // High - process sensor data quickly
+#define ACTUATOR_HUB_TASK_PRIORITY 2   // Medium - execute control commands
+#define COMMUNICATION_HUB_TASK_PRIORITY 1 // Lowest - non-critical background
 
 // --- Queues ---
 static QueueHandle_t xSensorDataQueue = NULL;
@@ -58,20 +58,20 @@ static QueueSetHandle_t xControllerQueueSet = NULL;
 
 void hrms_taskmanager_setup(void) {
 
-  xSensorDataQueue = xQueueCreate(5, sizeof(hrms_sensor_data_t));
+  xSensorDataQueue = xQueueCreate(15, sizeof(hrms_sensor_data_t));
   configASSERT(xSensorDataQueue != NULL);
 
-  xActuatorCmdQueue = xQueueCreate(5, sizeof(hrms_actuator_command_t));
+  xActuatorCmdQueue = xQueueCreate(10, sizeof(hrms_actuator_command_t));
   configASSERT(xActuatorCmdQueue != NULL);
 
-  xButtonEventQueue = xQueueCreate(5, sizeof(hrms_button_event_t));
+  xButtonEventQueue = xQueueCreate(8, sizeof(hrms_button_event_t));
   configASSERT(xButtonEventQueue != NULL);
 
-  xCommCmdQueue = xQueueCreate(5, sizeof(hrms_comm_command_t));
+  xCommCmdQueue = xQueueCreate(10, sizeof(hrms_comm_command_t));
   configASSERT(xCommCmdQueue != NULL);
 
-  // Queue set
-  xControllerQueueSet = xQueueCreateSet(10);
+  // Queue set - sum of member queue lengths
+  xControllerQueueSet = xQueueCreateSet(15 + 8); // sensor + button
   configASSERT(xControllerQueueSet != NULL);
   xQueueAddToSet(xSensorDataQueue, xControllerQueueSet);
   xQueueAddToSet(xButtonEventQueue, xControllerQueueSet);
@@ -106,7 +106,10 @@ static void vSensorHubTask(void *pvParameters) {
 
   for (;;) {
     if (hrms_sensor_hub_read(&sensor_data)) {
-      xQueueSendToBack(xSensorDataQueue, &sensor_data, 0);
+      // Add error handling with timeout
+      if (xQueueSendToBack(xSensorDataQueue, &sensor_data, pdMS_TO_TICKS(10)) != pdPASS) {
+        // Queue full - sensor data lost (could add error counter here)
+      }
     }
 
     vTaskDelay(pdMS_TO_TICKS(200)); // Slower sensor reading for stability
@@ -145,7 +148,9 @@ static void vActuatorHubTask(void *pvParameters) {
       
       // Forward communication commands to communication task queue
       if (command.comm.should_transmit) {
-        xQueueSendToBack(xCommCmdQueue, &command.comm, 0);
+        if (xQueueSendToBack(xCommCmdQueue, &command.comm, pdMS_TO_TICKS(10)) != pdPASS) {
+          // Communication queue full - command lost
+        }
       }
     }
     vTaskDelay(pdMS_TO_TICKS(50));
@@ -162,8 +167,8 @@ static void vCommunicationHubTask(void *pvParameters) {
     // Process communication hub (maintenance tasks)
     hrms_communication_hub_process();
 
-    // Handle outgoing communication commands (TX)
-    if (xQueueReceive(xCommCmdQueue, &comm_cmd, 0) == pdPASS) {
+    // Handle outgoing communication commands (TX) - block for efficiency
+    if (xQueueReceive(xCommCmdQueue, &comm_cmd, pdMS_TO_TICKS(10)) == pdPASS) {
       if (comm_cmd.should_transmit) {
         hrms_communication_hub_send_joystick_data(&comm_cmd);
       }
@@ -182,7 +187,7 @@ static void vCommunicationHubTask(void *pvParameters) {
       }
     }
 
-    vTaskDelay(pdMS_TO_TICKS(50)); // 50ms cycle time
+    vTaskDelay(pdMS_TO_TICKS(20)); // Reduced cycle time for better responsiveness
   }
 }
 
@@ -193,7 +198,9 @@ static void handle_sensor_data(void) {
 
   if (xQueueReceive(xSensorDataQueue, &sensor_data, 0) == pdPASS) {
     hrms_controller_process(&sensor_data, &command);
-    xQueueSendToBack(xActuatorCmdQueue, &command, 0);
+    if (xQueueSendToBack(xActuatorCmdQueue, &command, pdMS_TO_TICKS(10)) != pdPASS) {
+      // Actuator queue full - command lost
+    }
   }
 }
 
@@ -203,6 +210,8 @@ static void handle_button_event(void) {
 
   if (xQueueReceive(xButtonEventQueue, &event, 0) == pdPASS) {
     hrms_controller_process_button(&event, &command);
-    xQueueSendToBack(xActuatorCmdQueue, &command, 0);
+    if (xQueueSendToBack(xActuatorCmdQueue, &command, pdMS_TO_TICKS(10)) != pdPASS) {
+      // Actuator queue full - command lost
+    }
   }
 }

@@ -164,4 +164,15 @@ void hrms_nrf24l01_power_down(void);
  */
 void hrms_nrf24l01_power_up(void);
 
+/**
+ * @brief Perform self-test with LED feedback
+ * @return true if all tests pass, false otherwise
+ * 
+ * LED behavior during test:
+ * - Blinks during testing
+ * - Solid ON if all tests pass
+ * - OFF if any test fails
+ */
+bool hrms_nrf24l01_self_test(void);
+
 #endif /* HRMS_NRF24L01_H */

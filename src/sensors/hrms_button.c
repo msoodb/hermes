@@ -24,6 +24,9 @@ static QueueHandle_t button_queue = NULL;
 static uint32_t last_press_tick = 0;
 
 static void button_exti_handler(void) {
+  // Immediate visual feedback to test if EXTI is working
+  hrms_gpio_toggle_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+  
   if (button_queue == NULL) {
     return;
   }
@@ -54,12 +57,15 @@ static void button_exti_handler(void) {
 void hrms_button_init(QueueHandle_t controller_queue) {
   button_queue = controller_queue;
 
+  // Enable AFIO clock for EXTI
+  RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+
   // Configure as input with Pull‑Up
   hrms_gpio_config_input_pullup((uint32_t)HRMS_BUTTON_PORT, HRMS_BUTTON_PIN);
 
-  // EXTI mapping for PA4
-  AFIO->EXTICR[1] &= ~(0xF << (4 * (HRMS_BUTTON_PIN - 4)));
-  AFIO->EXTICR[1] |= (AFIO_EXTICR2_EXTI4_PA << (4 * (HRMS_BUTTON_PIN - 4)));
+  // EXTI mapping for PA0 (EXTI0)
+  AFIO->EXTICR[0] &= ~(0xF << (4 * HRMS_BUTTON_PIN));
+  AFIO->EXTICR[0] |= (0x0 << (4 * HRMS_BUTTON_PIN)); // 0x0 = GPIOA
 
   // Trigger both edges
   EXTI->IMR |= (1 << HRMS_BUTTON_PIN);
@@ -70,6 +76,6 @@ void hrms_button_init(QueueHandle_t controller_queue) {
   hrms_exti_register_callback(HRMS_BUTTON_PIN, button_exti_handler);
 
   // Enable IRQ
-  NVIC_EnableIRQ(EXTI4_IRQn);
+  NVIC_EnableIRQ(EXTI0_IRQn);
 }
 

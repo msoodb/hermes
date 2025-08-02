@@ -31,7 +31,6 @@ void hrms_controller_init(void) {
   memset(&default_actuator_cmd, 0, sizeof(default_actuator_cmd));
 
   // Set static values once during init
-  default_actuator_cmd.alarm.active = false;
   default_actuator_cmd.led.mode = HRMS_LED_MODE_BLINK;
   default_actuator_cmd.led.toggle_debug_led = false;
 
@@ -64,7 +63,7 @@ void hrms_controller_process(const hrms_sensor_data_t *in,
   *out = default_actuator_cmd;
 
   // Only update dynamic values
-  out->led.blink_speed_ms = 200; // in->potentiometer.raw_value;
+  out->led.blink_speed_ms = 200;
 
   // Update dynamic OLED text based on joystick button state
   safe_strncpy(out->oled.smalltext2,

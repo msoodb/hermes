@@ -11,6 +11,7 @@
 #include "hrms_gpio.h"
 #include "hrms_delay.h"
 #include "hrms_pins.h"
+#include <stdbool.h>
 
 // SPI Configuration
 #define SPI_TIMEOUT_MS 100
@@ -23,9 +24,9 @@ static bool spi_initialized = false;
  */
 int hrms_spi1_init(void) {
     if (spi_initialized) {
-        return 0; // Already initialized
+        return 1; // Already initialized - success
     }
-    
+      
     // Enable SPI1 and GPIOA clocks
     RCC->APB2ENR |= RCC_APB2ENR_SPI1EN | RCC_APB2ENR_IOPAEN;
     
@@ -51,16 +52,15 @@ int hrms_spi1_init(void) {
     SPI1->CR1 = 0; // Reset control register
     SPI1->CR1 |= SPI_CR1_MSTR;        // Master mode
     SPI1->CR1 |= SPI_CR1_BR_2;        // Baudrate = fPCLK/32 (72MHz/32 = 2.25MHz)
-    SPI1->CR1 |= SPI_CR1_CPOL;        // Clock polarity high when idle
-    SPI1->CR1 |= SPI_CR1_CPHA;        // Clock phase - data captured on rising edge
+    // nRF24L01 requires SPI Mode 0: CPOL=0, CPHA=0 (default - don't set these bits)
     SPI1->CR1 |= SPI_CR1_SSM;         // Software slave management
     SPI1->CR1 |= SPI_CR1_SSI;         // Internal slave select
     
     // Enable SPI1
     SPI1->CR1 |= SPI_CR1_SPE;
-    
+
     spi_initialized = true;
-    return 0;
+    return 1; // Success
 }
 
 /**

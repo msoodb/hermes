@@ -100,21 +100,13 @@ typedef struct {
 } hrms_imu_data_t;
 
 typedef struct {
-  uint16_t raw_value;  // raw ADC reading from potentiometer (0-4095)
-} hrms_potentiometer_data_t;
-
-
-typedef struct {
   int16_t x_axis;      // -1000 to +1000 (left to right)
   int16_t y_axis;      // -1000 to +1000 (down to up)
   bool button_pressed; // true if SW button is pressed
 } hrms_joystick_data_t;
 
-
-
 typedef struct {
   hrms_imu_data_t imu;
-  hrms_potentiometer_data_t potentiometer;
   hrms_joystick_data_t joystick;
 } hrms_sensor_data_t;
 
@@ -147,13 +139,6 @@ typedef struct {
 
 } hrms_oled_command_t;
 
-typedef struct {
-  bool active;
-  uint8_t pattern_id;
-  uint16_t duration_ms;
-  uint8_t volume;
-} hrms_alarm_command_t;
-
 typedef enum {
   HRMS_LED_MODE_OFF = 0,
   HRMS_LED_MODE_ON,
@@ -181,7 +166,6 @@ typedef struct {
 typedef struct {
   hrms_oled_command_t oled;
   hrms_led_command_t led;
-  hrms_alarm_command_t alarm;
   hrms_comm_command_t comm;                    // Communication command
 } hrms_actuator_command_t;
 

@@ -24,6 +24,15 @@ void hrms_exti_register_callback(uint8_t exti_line,
   }
 }
 
+void EXTI0_IRQHandler(void) {
+  if (EXTI->PR & (1U << 0)) {
+    EXTI->PR = (1U << 0);
+    if (exti_callbacks[0]) {
+      exti_callbacks[0]();
+    }
+  }
+}
+
 void EXTI4_IRQHandler(void) {
   if (EXTI->PR & (1U << 4)) {
     EXTI->PR = (1U << 4);

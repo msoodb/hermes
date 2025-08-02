@@ -14,6 +14,7 @@
 #include "hrms_spi.h"
 #include "hrms_delay.h"
 #include "libc_stubs.h"
+#include <stdbool.h>
 
 // Module state
 static bool is_listening = false;
@@ -37,19 +38,16 @@ bool hrms_nrf24l01_init(void) {
   hrms_gpio_config_output((uint32_t)HRMS_NRF24L01_CE_PORT, HRMS_NRF24L01_CE_PIN);
   hrms_gpio_config_input_pullup((uint32_t)HRMS_NRF24L01_IRQ_PORT, HRMS_NRF24L01_IRQ_PIN);
   
-  // Initialize SPI pins
-  hrms_gpio_config_alternate_pushpull((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_SCK_PIN);
-  hrms_gpio_config_alternate_pushpull((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_MISO_PIN);
-  hrms_gpio_config_alternate_pushpull((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_MOSI_PIN);
+  // Initialize SPI pins for software (bit-bang) SPI
+  hrms_gpio_config_output((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_SCK_PIN);
+  hrms_gpio_config_input((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_MISO_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_MOSI_PIN);
   
   // Set initial pin states
   nrf24l01_cs_high();
   nrf24l01_ce_low();
-  
-  // Initialize SPI interface (using SPI1 as fallback)
-  if (!hrms_spi1_init()) {
-    return false;
-  }
+  hrms_gpio_clear_pin((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_SCK_PIN);   // SCK low
+  hrms_gpio_clear_pin((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_MOSI_PIN);  // MOSI low
   
   // Wait for module to power up
   hrms_delay_ms(100);
@@ -77,7 +75,7 @@ bool hrms_nrf24l01_init(void) {
   nrf24l01_cs_high();
   
   is_listening = false;
-  
+
   return true;
 }
 
@@ -289,17 +287,51 @@ void hrms_nrf24l01_power_up(void) {
   hrms_delay_ms(2); // Wait for power up
 }
 
-// Low-level helper functions
+// Low-level helper functions - Software SPI implementation (slower and more stable)
 static uint8_t nrf24l01_spi_transfer(uint8_t data) {
-  return hrms_spi1_transfer(data);
+  uint8_t result = 0;
+  
+  // Ensure initial state
+  hrms_gpio_clear_pin((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_SCK_PIN);   // Clock low
+  hrms_delay_us(5);
+  
+  for (int i = 7; i >= 0; i--) {
+    // Set MOSI bit (setup time)
+    if (data & (1 << i)) {
+      hrms_gpio_set_pin((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_MOSI_PIN);
+    } else {
+      hrms_gpio_clear_pin((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_MOSI_PIN);
+    }
+    hrms_delay_us(5); // Setup time
+    
+    // Clock high 
+    hrms_gpio_set_pin((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_SCK_PIN);
+    hrms_delay_us(2); // Setup time before sampling
+    
+    // Read MISO bit (sample on high clock)
+    if (hrms_gpio_read_pin((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_MISO_PIN)) {
+      result |= (1 << i);
+    }
+    
+    hrms_delay_us(3); // Hold time after sampling
+    
+    // Clock low
+    hrms_gpio_clear_pin((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_SCK_PIN);
+    hrms_delay_us(5); // Recovery time
+  }
+  
+  return result;
 }
 
 static void nrf24l01_cs_low(void) {
   hrms_gpio_clear_pin((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_NSS_PIN);
+  hrms_delay_us(5); // CS setup time
 }
 
 static void nrf24l01_cs_high(void) {
+  hrms_delay_us(5); // CS hold time
   hrms_gpio_set_pin((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_NSS_PIN);
+  hrms_delay_us(5); // CS recovery time
 }
 
 static void nrf24l01_ce_low(void) {
@@ -332,5 +364,119 @@ static void nrf24l01_write_register_multi(uint8_t reg, const uint8_t *data, uint
     nrf24l01_spi_transfer(data[i]);
   }
   nrf24l01_cs_high();
+}
+
+bool hrms_nrf24l01_self_test(void) {
+  // Initialize debug LED
+  hrms_gpio_config_output((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+  hrms_gpio_clear_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+  
+  // Comprehensive nRF24L01 self-test - runs on every system restart
+  // Fast blinks to minimize time, but thorough testing
+  
+  // Configure all pins
+  hrms_gpio_config_output((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_NSS_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_NRF24L01_CE_PORT, HRMS_NRF24L01_CE_PIN);
+  hrms_gpio_config_input_pullup((uint32_t)HRMS_NRF24L01_IRQ_PORT, HRMS_NRF24L01_IRQ_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_SCK_PIN);
+  hrms_gpio_config_input((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_MISO_PIN);
+  hrms_gpio_config_output((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_MOSI_PIN);
+  
+  // Set initial state
+  hrms_gpio_set_pin((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_NSS_PIN);   // CS high
+  hrms_gpio_clear_pin((uint32_t)HRMS_NRF24L01_CE_PORT, HRMS_NRF24L01_CE_PIN);   // CE low
+  hrms_gpio_clear_pin((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_SCK_PIN);  // SCK low
+  hrms_gpio_clear_pin((uint32_t)HRMS_NRF24L01_SPI_PORT, HRMS_NRF24L01_MOSI_PIN); // MOSI low
+  
+  // Wait for module power up
+  hrms_delay_ms(50); // Reduced from 100ms
+  
+  bool test_passed = true;
+  
+  // Test 1: Basic SPI response test
+  nrf24l01_cs_low();
+  uint8_t status = nrf24l01_spi_transfer(NRF24L01_CMD_NOP);
+  nrf24l01_cs_high();
+  
+  bool spi_ok = (status != 0x00 && status != 0xFF);
+  if (!spi_ok) test_passed = false;
+  
+  // Test 2: Register read/write validation
+  uint8_t original_ch = nrf24l01_read_register(NRF24L01_REG_RF_CH);
+  
+  // Write test value 42
+  nrf24l01_write_register(NRF24L01_REG_RF_CH, 42);
+  uint8_t read_ch = nrf24l01_read_register(NRF24L01_REG_RF_CH);
+  
+  bool reg_write_ok = (read_ch == 42);
+  if (!reg_write_ok) test_passed = false;
+  
+  // Test 3: Second register test
+  uint8_t original_setup = nrf24l01_read_register(NRF24L01_REG_RF_SETUP);
+  nrf24l01_write_register(NRF24L01_REG_RF_SETUP, 0x26);
+  uint8_t read_setup = nrf24l01_read_register(NRF24L01_REG_RF_SETUP);
+  
+  bool reg_write2_ok = (read_setup == 0x26);
+  if (!reg_write2_ok) test_passed = false;
+  
+  // Test 4: Restore original values
+  nrf24l01_write_register(NRF24L01_REG_RF_CH, original_ch);
+  nrf24l01_write_register(NRF24L01_REG_RF_SETUP, original_setup);
+  
+  uint8_t restored_ch = nrf24l01_read_register(NRF24L01_REG_RF_CH);
+  uint8_t restored_setup = nrf24l01_read_register(NRF24L01_REG_RF_SETUP);
+  
+  bool restore_ok = (restored_ch == original_ch && restored_setup == original_setup);
+  if (!restore_ok) test_passed = false;
+  
+  // Show test progress with fast blinks during testing
+  // 1 blink per test passed, fast error pattern if any fail
+  if (spi_ok) {
+    hrms_gpio_set_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+    hrms_delay_ms(30);
+    hrms_gpio_clear_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+    hrms_delay_ms(30);
+  }
+  
+  if (reg_write_ok) {
+    hrms_gpio_set_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+    hrms_delay_ms(30);
+    hrms_gpio_clear_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+    hrms_delay_ms(30);
+  }
+  
+  if (reg_write2_ok) {
+    hrms_gpio_set_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+    hrms_delay_ms(30);
+    hrms_gpio_clear_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+    hrms_delay_ms(30);
+  }
+  
+  if (restore_ok) {
+    hrms_gpio_set_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+    hrms_delay_ms(30);
+    hrms_gpio_clear_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+    hrms_delay_ms(30);
+  }
+  
+  hrms_delay_ms(100); // Short pause before final result
+  
+  // Final result indication
+  if (test_passed) {
+    // All tests passed: LED solid ON for 200ms then off
+    hrms_gpio_set_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+    hrms_delay_ms(200);
+    hrms_gpio_clear_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+  } else {
+    // Test failed: Fast error pattern (6 fast blinks) then off
+    for (int i = 0; i < 6; i++) {
+      hrms_gpio_set_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+      hrms_delay_ms(25);
+      hrms_gpio_clear_pin((uint32_t)HRMS_LED_DEBUG_PORT, HRMS_LED_DEBUG_PIN);
+      hrms_delay_ms(25);
+    }
+  }
+  
+  return test_passed;
 }
 

@@ -9,7 +9,6 @@
 
 #include "hrms_communication_hub.h"
 #include "hrms_nrf24_comm.h"
-#include "hrms_lora_comm.h"
 #include "hrms_packet_utils.h"
 #include "hrms_types.h"
 #include "ORION_Config.h"
@@ -30,7 +29,6 @@ void hrms_communication_hub_init(void) {
   
   // Initialize communication modules (following sensor/actuator pattern)
   hrms_nrf24_comm_init();
-  hrms_lora_comm_init();
 }
 
 bool hrms_communication_hub_send(const uint8_t *data, size_t len) {
@@ -38,16 +36,8 @@ bool hrms_communication_hub_send(const uint8_t *data, size_t len) {
     return false;
   }
   
-  bool success = false;
-  
-  // Try to send via available communication modules
-  // Primary: nRF24L01
-  success = hrms_nrf24_comm_send(data, len);
-  
-  // Backup: LoRa module for redundancy
-  if (!success) {
-    success = hrms_lora_comm_send(data, len);
-  }
+  // Send via nRF24L01
+  bool success = hrms_nrf24_comm_send(data, len);
   
   // Update statistics
   if (success) {
@@ -66,19 +56,11 @@ bool hrms_communication_hub_receive(uint8_t *data, size_t max_len, size_t *recei
   }
   
   *received_len = 0;
-  bool received = false;
   
-  // Check communication modules for received data
-  // Try nRF24L01 first
-  if (hrms_nrf24_comm_receive(data, max_len, received_len)) {
-    received = true;
-    comm_stats.packets_received++;
-    comm_stats.last_rx_timestamp = xTaskGetTickCount();
-  }
+  // Check nRF24L01 for received data
+  bool received = hrms_nrf24_comm_receive(data, max_len, received_len);
   
-  // Try LoRa module if no data from nRF24
-  if (!received && hrms_lora_comm_receive(data, max_len, received_len)) {
-    received = true;
+  if (received) {
     comm_stats.packets_received++;
     comm_stats.last_rx_timestamp = xTaskGetTickCount();
   }
@@ -87,9 +69,8 @@ bool hrms_communication_hub_receive(uint8_t *data, size_t max_len, size_t *recei
 }
 
 void hrms_communication_hub_process(void) {
-  // Process all communication modules (following sensor/actuator pattern)
+  // Process nRF24L01 communication module
   hrms_nrf24_comm_process();
-  hrms_lora_comm_process();
 }
 
 void hrms_communication_hub_get_stats(hrms_comm_stats_t *stats) {

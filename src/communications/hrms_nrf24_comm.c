@@ -9,12 +9,23 @@
 
 #include "hrms_nrf24_comm.h"
 #include "hrms_nrf24l01.h"
+#include "hrms_gpio.h"
+#include "hrms_pins.h"
 
 // nRF24 communication module following sensor/actuator pattern
 bool hrms_nrf24_comm_init(void) {
+
+
   if (!hrms_nrf24l01_init()) {
     return false;
   }
+
+      
+  // Perform self-test with LED feedback
+  if (!hrms_nrf24l01_self_test()) {
+    return false;  // Self-test failed
+  }
+
   
   // Configure nRF24L01 with default settings for Hermes RC transmitter
   nrf24l01_config_t config = {
