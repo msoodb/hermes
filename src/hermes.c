@@ -19,6 +19,9 @@
 
 #include "hrms_board.h"
 #include "hrms_taskmanager.h"
+#include "hrms_gpio.h"
+#include "hrms_delay.h"
+#include "stm32f1xx.h"
 
 /**
  * @brief Main function: Initializes hardware and starts RTOS task management.

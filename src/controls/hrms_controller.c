@@ -42,9 +42,7 @@ void hrms_controller_init(void) {
   default_actuator_cmd.oled.invert = 0;
   default_actuator_cmd.oled.progress_percent = 100;
 
-  // Set static text strings
-  safe_strncpy(default_actuator_cmd.oled.smalltext1, "JOY",
-               HRMS_OLED_MAX_SMALL_TEXT_LEN);
+  // Set static text strings (smalltext1 and smalltext2 are dynamic)
   safe_strncpy(default_actuator_cmd.oled.bigtext, "HERMES 2025",
                HRMS_OLED_MAX_BIG_TEXT_LEN);
 
@@ -65,10 +63,25 @@ void hrms_controller_process(const hrms_sensor_data_t *in,
   // Only update dynamic values
   out->led.blink_speed_ms = 200;
 
-  // Update dynamic OLED text based on joystick button state
-  safe_strncpy(out->oled.smalltext2,
-               in->joystick.button_pressed ? "BTN" : "---",
-               HRMS_OLED_MAX_SMALL_TEXT_LEN);
+  // Update dynamic OLED text with joystick movement and button state
+  // Show X and Y values in smalltext1 and smalltext2
+  
+  // Build X axis display: "X:123"
+  strcpy(num_buf, "X:");
+  char x_str[8];
+  int_to_string(in->joystick.x_axis, x_str, sizeof(x_str));
+  strcat(num_buf, x_str);
+  safe_strncpy(out->oled.smalltext1, num_buf, HRMS_OLED_MAX_SMALL_TEXT_LEN);
+  
+  // Build Y axis display: "Y:123" or "Y:123 BTN"
+  strcpy(num_buf, "Y:");
+  char y_str[8];
+  int_to_string(in->joystick.y_axis, y_str, sizeof(y_str));
+  strcat(num_buf, y_str);
+  if (in->joystick.button_pressed) {
+    strcat(num_buf, " BTN");
+  }
+  safe_strncpy(out->oled.smalltext2, num_buf, HRMS_OLED_MAX_SMALL_TEXT_LEN);
 
   // Controller logic: decide if joystick data should be transmitted
   static hrms_joystick_data_t last_joystick = {0};

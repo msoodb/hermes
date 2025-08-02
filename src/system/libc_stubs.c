@@ -69,3 +69,41 @@ void safe_strncpy(char *dest, const char *src, size_t max_len) {
   memcpy(dest, src, copy_len);
   dest[copy_len] = '\0';  // Ensure null termination
 }
+
+// Simple integer to string conversion for embedded use
+void int_to_string(int value, char *buffer, size_t buffer_size) {
+  if (buffer_size < 2) return; // Need at least space for '0' and '\0'
+  
+  char *ptr = buffer;
+  
+  // Handle negative numbers
+  if (value < 0) {
+    value = -value;
+    *ptr++ = '-';
+    buffer_size--;
+  }
+  
+  // Handle zero case
+  if (value == 0) {
+    *ptr++ = '0';
+    *ptr = '\0';
+    return;
+  }
+  
+  // Convert digits (reverse order first)
+  char temp[12]; // Enough for 32-bit int
+  size_t temp_len = 0;
+  
+  while (value > 0 && temp_len < sizeof(temp) - 1) {
+    temp[temp_len++] = '0' + (value % 10);
+    value /= 10;
+  }
+  
+  // Copy digits in correct order
+  for (size_t i = temp_len; i > 0 && buffer_size > 1; i--) {
+    *ptr++ = temp[i - 1];
+    buffer_size--;
+  }
+  
+  *ptr = '\0';
+}
